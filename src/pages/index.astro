@@ -189,7 +189,7 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
 
     <script is:inline>
       const allItems = {
-        ${items.map(item => `'${item.id}': ${JSON.stringify(item)}`).join(',\n')}
+        ${items.map(item => `'${item.id}': ${JSON.stringify(item)}`).join(',\n')
       };
 
       document.addEventListener('DOMContentLoaded', () => {
