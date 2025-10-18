@@ -11,34 +11,19 @@ const base = new Airtable({
 let items = [];
 try {
   const records = await base(import.meta.env.PUBLIC_AIRTABLE_TABLE_NAME)
-    .select({
-      maxRecords: 100, // Recupera fino a 100 record per avere una buona base per la casualità
-      filterByFormula: "{Edited} = 1"
-    })
+  .select({ maxRecords: 100 })
     .all();
  
-  let allEditedItems = records.map(record => ({
+  items = records.map(record => ({
     id: record.id,
     name: record.fields.Name,
     description: record.fields.Description,
-    image: record.fields.Edited?.[0]?.url,
+    image: record.fields.Image?.[0]?.url,
     category: record.fields.Category,
     region: record.fields.Region,
     seasonality: record.fields.Seasonality,
     producers: record.fields.Producers
   }));
-
-  // --- MODIFICA: Mescola l'array e seleziona i primi 10 elementi ---
-  // Algoritmo di shuffle (Fisher-Yates)
-  for (let i = allEditedItems.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allEditedItems[i], allEditedItems[j]] = [allEditedItems[j], allEditedItems[i]];
-  }
-
-  // Seleziona solo i primi 10 record dopo averli mescolati
-  items = allEditedItems.slice(0, 10);
-  // --- FINE MODIFICA ---
-
 } catch (error) {
   console.error('Errore caricamento dati:', error);
 }
@@ -65,61 +50,47 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>Astro</title>
-    
+
     <style>
       /* --- IMPOSTAZIONI GLOBALI --- */
       html {
         cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><circle cx='8' cy='8' r='2' fill='%23D2B48C'/><circle cx='8' cy='8' r='7' stroke='%23D2B48C' stroke-width='1' fill='none'/></svg>"), auto;
-        height: 100%;
       }
       
       body {
         background-color: #3D2B1F;
         color: #d3a76e;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
+        line-height: 1.6; margin: 0; padding: 0; overflow-x: hidden;
       }
       body.panel-open { overflow: hidden; }
 
-      /* --- TIPOGRAFIA --- */
+      /* --- TIPOGRAFIA (MODIFICATO) --- */
       h1 {
-        font-size: 4vw;
-        max-height: 70px;
+        font-size: 70px;
         font-weight: 700;
         text-align: center;
         line-height: 1.2;
-        margin: 20px 0;
+        margin: 40px 0; /* Aggiunto spazio sopra e sotto */
         padding: 0;
         color: #D2B48C;
-        flex-shrink: 0;
       }
 
-      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI --- */
+      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI (MODIFICATO) --- */
       .image-canvas {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 20px;
         padding: 20px;
         max-width: 1200px;
-        width: 100%;
         margin: 0 auto;
-        box-sizing: border-box;
-        flex-grow: 1;
-        overflow-y: auto;
-        min-height: 0;
       }
 
-      /* --- STILE DEL CONTENITORE 'card' --- */
+      /* --- STILE DEL CONTENITORE 'card' (MODIFICATO) --- */
       .card {
-        position: relative;
+        position: relative; /* Rimosso 'absolute' */
         width: 100%;
-        aspect-ratio: 1 / 1;
+        aspect-ratio: 1 / 1; /* Mantiene le card quadrate */
         overflow: hidden;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -136,7 +107,9 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
       /* --- ETICHETTE (usate nel pannello) --- */
       .category {
         display: inline-block; font-size: 0.8rem; padding: 0.2rem 0.5rem;
-        border: 1px solid #D2B48C; margin: 0.2rem; color: #D2B48C;
+        border: 1px solid #D2B48C;
+        margin: 0.2rem;
+        color: #D2B48C;
       }
       
       /* --- FORM DI CONTRIBUTO --- */
@@ -225,6 +198,9 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
 
       document.addEventListener('DOMContentLoaded', () => {
         const cards = document.querySelectorAll('.card');
+        
+        // --- BLOCCO DI POSIZIONAMENTO RANDOM RIMOSSO ---
+        
         const sidePanel = document.getElementById('sidePanel');
         const panelOverlay = document.getElementById('panelOverlay');
         const closePanelBtn = document.getElementById('closePanelBtn');
@@ -303,6 +279,7 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
           submitBtn.textContent = 'Invia contributo';
         }
       });
+
     </script>
   </body>
 </html>
