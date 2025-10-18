@@ -10,16 +10,14 @@ const base = new Airtable({
 // Recupera i dati
 let items = [];
 try {
-  // MODIFICA: Aggiunto filterByFormula per caricare solo i record con la checkbox "Edited" spuntata.
-  // Assicurati che il nome del campo in Airtable sia esattamente "Edited" (case-sensitive).
   const records = await base(import.meta.env.PUBLIC_AIRTABLE_TABLE_NAME)
     .select({
-      maxRecords: 100,
+      maxRecords: 100, // Recupera fino a 100 record per avere una buona base per la casualità
       filterByFormula: "{Edited} = 1"
     })
     .all();
  
-  items = records.map(record => ({
+  let allEditedItems = records.map(record => ({
     id: record.id,
     name: record.fields.Name,
     description: record.fields.Description,
@@ -29,6 +27,18 @@ try {
     seasonality: record.fields.Seasonality,
     producers: record.fields.Producers
   }));
+
+  // --- MODIFICA: Mescola l'array e seleziona i primi 10 elementi ---
+  // Algoritmo di shuffle (Fisher-Yates)
+  for (let i = allEditedItems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allEditedItems[i], allEditedItems[j]] = [allEditedItems[j], allEditedItems[i]];
+  }
+
+  // Seleziona solo i primi 10 record dopo averli mescolati
+  items = allEditedItems.slice(0, 10);
+  // --- FINE MODIFICA ---
+
 } catch (error) {
   console.error('Errore caricamento dati:', error);
 }
@@ -57,10 +67,10 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
     <title>Astro</title>
     
     <style>
-      /* --- IMPOSTAZIONI GLOBALI (MODIFICATO) --- */
+      /* --- IMPOSTAZIONI GLOBALI --- */
       html {
         cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><circle cx='8' cy='8' r='2' fill='%23D2B48C'/><circle cx='8' cy='8' r='7' stroke='%23D2B48C' stroke-width='1' fill='none'/></svg>"), auto;
-        height: 100%; /* Occupa l'intera altezza */
+        height: 100%;
       }
       
       body {
@@ -70,16 +80,16 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         line-height: 1.6;
         margin: 0;
         padding: 0;
-        height: 100%; /* Occupa l'intera altezza */
-        overflow: hidden; /* Disabilita lo scroll della pagina */
-        display: flex; /* Usa Flexbox per il layout */
-        flex-direction: column; /* Disposizione verticale */
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
       body.panel-open { overflow: hidden; }
 
       /* --- TIPOGRAFIA --- */
       h1 {
-        font-size: 4vw; /* Dimensione fluida */
+        font-size: 4vw;
         max-height: 70px;
         font-weight: 700;
         text-align: center;
@@ -87,10 +97,10 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         margin: 20px 0;
         padding: 0;
         color: #D2B48C;
-        flex-shrink: 0; /* Impedisce al titolo di restringersi */
+        flex-shrink: 0;
       }
 
-      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI (MODIFICATO) --- */
+      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI --- */
       .image-canvas {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -100,9 +110,9 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
-        flex-grow: 1; /* Occupa tutto lo spazio verticale rimanente */
-        overflow-y: auto; /* Abilita lo scroll solo per la griglia se necessario */
-        min-height: 0; /* Fix per flexbox per evitare overflow */
+        flex-grow: 1;
+        overflow-y: auto;
+        min-height: 0;
       }
 
       /* --- STILE DEL CONTENITORE 'card' --- */
