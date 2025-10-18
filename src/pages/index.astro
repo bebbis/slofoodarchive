@@ -51,8 +51,6 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
     <meta name="generator" content={Astro.generator} />
     <title>Astro</title>
 
-    <!--test valentina -->
-    
     <style>
       /* --- IMPOSTAZIONI GLOBALI --- */
       html {
@@ -67,29 +65,35 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
       }
       body.panel-open { overflow: hidden; }
 
-      /* --- TIPOGRAFIA --- */
+      /* --- TIPOGRAFIA (MODIFICATO) --- */
       h1 {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
         font-size: 70px;
         font-weight: 700;
         text-align: center;
         line-height: 1.2;
-        z-index: 1;
-        margin: 0; padding: 0;
+        margin: 40px 0; /* Aggiunto spazio sopra e sotto */
+        padding: 0;
         color: #D2B48C;
-        opacity: 1;
       }
 
-      /* --- CONTENITORE PER LE IMMAGINI SPARSE --- */
+      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI (MODIFICATO) --- */
       .image-canvas {
-        position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
       }
 
-      /* --- STILE DEL CONTENITORE 'card' --- */
+      /* --- STILE DEL CONTENITORE 'card' (MODIFICATO) --- */
       .card {
-        position: absolute; width: 100px; height: 100px; overflow: hidden;
-        cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;
-        z-index: 2;
+        position: relative; /* Rimosso 'absolute' */
+        width: 100%;
+        aspect-ratio: 1 / 1; /* Mantiene le card quadrate */
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
       .card img {
         width: 100%; height: 100%; object-fit: cover; display: block;
@@ -193,54 +197,9 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
       };
 
       document.addEventListener('DOMContentLoaded', () => {
-        const canvas = document.querySelector('.image-canvas');
         const cards = document.querySelectorAll('.card');
         
-        if (cards.length > 0) {
-            const placedItems = [];
-            const maxAttemptsPerCard = 50;
-            const cardWidth = 100;
-            const cardHeight = 100;
-            const minMargin = 20;
-            const canvasWidth = canvas.offsetWidth;
-            const canvasHeight = canvas.offsetHeight;
-            
-            cards.forEach(card => {
-                let attempts = 0;
-                let isOverlapping;
-                let newCardRect;
-
-                do {
-                    const randomX = Math.random() * (canvasWidth - cardWidth);
-                    const randomY = Math.random() * (canvasHeight - cardHeight);
-                    newCardRect = {
-                        x: randomX - minMargin, y: randomY - minMargin,
-                        width: cardWidth + (minMargin * 2), height: cardHeight + (minMargin * 2)
-                    };
-                    isOverlapping = false;
-                    for (const placedRect of placedItems) {
-                        if (newCardRect.x < placedRect.x + placedRect.width &&
-                            newCardRect.x + newCardRect.width > placedRect.x &&
-                            newCardRect.y < placedRect.y + placedRect.height &&
-                            newCardRect.y + newCardRect.height > placedRect.y) {
-                            isOverlapping = true;
-                            break;
-                        }
-                    }
-                    attempts++;
-                } while (isOverlapping && attempts < maxAttemptsPerCard);
-
-                if (!isOverlapping) {
-                    const finalPos = { x: newCardRect.x + minMargin, y: newCardRect.y + minMargin };
-                    card.style.left = `${finalPos.x}px`;
-                    card.style.top = `${finalPos.y}px`;
-                    placedItems.push({ ...newCardRect, x: finalPos.x, y: finalPos.y });
-                } else {
-                    card.style.display = 'none';
-                    console.warn('Non è stato possibile trovare uno spazio libero per una card dopo molti tentativi.');
-                }
-            });
-        }
+        // --- BLOCCO DI POSIZIONAMENTO RANDOM RIMOSSO ---
         
         const sidePanel = document.getElementById('sidePanel');
         const panelOverlay = document.getElementById('panelOverlay');
