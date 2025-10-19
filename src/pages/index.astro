@@ -1,4 +1,5 @@
 ---
+// la riga in questi trattini dice all'indice quali devono essere le caratteristiche di base
 import Airtable from 'airtable';
 
 // Configura Airtable
@@ -10,14 +11,17 @@ const base = new Airtable({
 let items = [];
 try {
   const records = await base(import.meta.env.PUBLIC_AIRTABLE_TABLE_NAME)
-    .select({ maxRecords: 100 })
+  .select({ maxRecords: 100 })
     .all();
-
+ 
   items = records.map(record => ({
     id: record.id,
     name: record.fields.Name,
     description: record.fields.Description,
-    image: record.fields.Image?.[0]?.url,
+    // --- MODIFICA QUI ---
+    // L'immagine ora viene presa dalla colonna 'Edited' invece che 'Image'.
+    image: record.fields.Edited?.[0]?.url,
+    // --------------------
     category: record.fields.Category,
     region: record.fields.Region,
     seasonality: record.fields.Seasonality,
@@ -27,13 +31,21 @@ try {
   console.error('Errore caricamento dati:', error);
 }
 
-// --- LOGICA PER LA DATA ---
+// --- NUOVA LOGICA PER SELEZIONARE 10 IMMAGINI RANDOM ---
+const shuffledItems = [...items].sort(() => 0.5 - Math.random());
+const randomItems = shuffledItems.slice(0, 10);
+
+// --- LOGICA PER LA DATA E L'ORA IN INGLESE ---
 const now = new Date();
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const day = now.getDate();
 const month = months[now.getMonth()];
 const year = now.getFullYear();
 const dataCorrente = `${day} ${month} ${year}`;
+const hours = now.getHours().toString().padStart(2, '0');
+const minutes = now.getMinutes().toString().padStart(2, '0');
+const seconds = now.getSeconds().toString().padStart(2, '0');
+const oraCorrente = `${hours}:${minutes}:${seconds}`;
 ---
 
 <html lang="en">
@@ -42,15 +54,10 @@ const dataCorrente = `${day} ${month} ${year}`;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>Archivio Stagionale</title>
+    <title>Astro</title>
 
     <style>
       /* --- IMPOSTAZIONI GLOBALI --- */
-      html, body {
-        height: 100vh;
-        overflow: hidden;
-      }
-
       html {
         cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><circle cx='8' cy='8' r='2' fill='%23D2B48C'/><circle cx='8' cy='8' r='7' stroke='%23D2B48C' stroke-width='1' fill='none'/></svg>"), auto;
       }
@@ -59,60 +66,41 @@ const dataCorrente = `${day} ${month} ${year}`;
         background-color: #3D2B1F;
         color: #d3a76e;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        line-height: 1.6; margin: 0; padding: 0; overflow-x: hidden;
       }
       body.panel-open { overflow: hidden; }
 
+      /* --- TIPOGRAFIA (MODIFICATO) --- */
       h1 {
         font-size: 70px;
         font-weight: 700;
         text-align: center;
         line-height: 1.2;
-        margin: 0;
+        margin: 40px 0; /* Aggiunto spazio sopra e sotto */
         padding: 0;
         color: #D2B48C;
       }
 
-      h2 {
-        text-align: center;
-        font-weight: 400;
-        margin-top: -20px;
-        color: #D2B48C;
-      }
-
-      #clock {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 20px;
-      }
-
+      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI (MODIFICATO) --- */
       .image-canvas {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        /* MODIFICA QUI: Ridotto il valore minmax per rendere le immagini più piccole */
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 20px;
-        max-width: 80vw;
-        max-height: 60vh;
-        overflow: hidden;
-        margin-top: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
       }
 
+      /* --- STILE DEL CONTENITORE 'card' (MODIFICATO) --- */
       .card {
-        position: relative;
+        position: relative; /* Già corretto per evitare sovrapposizioni */
         width: 100%;
-        aspect-ratio: 1 / 1;
+        aspect-ratio: 1 / 1; /* Mantiene le card quadrate */
         overflow: hidden;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        opacity: 0;
-        animation: fadeIn 0.8s ease forwards;
       }
-
       .card img {
         width: 100%; height: 100%; object-fit: cover; display: block;
       }
@@ -121,18 +109,16 @@ const dataCorrente = `${day} ${month} ${year}`;
         transform: scale(1.1);
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
       }
-
-      @keyframes fadeIn {
-        to { opacity: 1; }
-      }
-
+      
+      /* --- ETICHETTE (usate nel pannello) --- */
       .category {
         display: inline-block; font-size: 0.8rem; padding: 0.2rem 0.5rem;
         border: 1px solid #D2B48C;
         margin: 0.2rem;
         color: #D2B48C;
       }
-
+      
+      /* --- FORM DI CONTRIBUTO --- */
       .contribute-section { position: fixed; bottom: 20px; right: 20px; z-index: 101; font-size: 14px; }
       .contribute-section summary {
         cursor: pointer; padding: 8px 12px; background-color: #3D2B1F;
@@ -157,13 +143,13 @@ const dataCorrente = `${day} ${month} ${year}`;
       .form-message.success { background-color: #e0f8e0; border: 1px solid #5cb85c; color: #333; }
       .form-message.error { background-color: #f8e0e0; border: 1px solid #d9534f; color: #333; }
 
+      /* --- PANNELLO LATERALE --- */
       .panel-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-color: rgba(0, 0, 0, 0.5); z-index: 99;
         opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease;
       }
       .panel-overlay.open { opacity: 1; visibility: visible; }
-
       .side-panel {
         position: fixed; top: 0; right: 0; width: 50vw; height: 100vh;
         background-color: #3D2B1F; border-left: 1px solid #D2B48C;
@@ -181,10 +167,15 @@ const dataCorrente = `${day} ${month} ${year}`;
   </head>
   <body>
     <h1>{dataCorrente}</h1>
-    <h2></h2>
-    <div id="clock"></div>
-
-    <div class="image-canvas"></div>
+    
+    <div class="image-canvas">
+      {/* MODIFICA QUI: Usiamo 'randomItems' (i 10 scelti a caso) invece di 'items' */}
+      {randomItems.map(item => (
+        <div class="card" data-id={item.id}>
+          {item.image && <img src={item.image} alt={item.name} />}
+        </div>
+      ))}
+    </div>
 
     <div id="panelOverlay" class="panel-overlay"></div>
     <div id="sidePanel" class="side-panel">
@@ -208,48 +199,16 @@ const dataCorrente = `${day} ${month} ${year}`;
     </details>
 
     <script is:inline>
-      // --- CALCOLO STAGIONE ---
-      function getSeason(monthIndex) {
-        if (monthIndex >= 2 && monthIndex <= 4) return "Primavera";
-        if (monthIndex >= 5 && monthIndex <= 7) return "Estate";
-        if (monthIndex >= 8 && monthIndex <= 10) return "Autunno";
-        return "Inverno";
-      }
-      const currentSeason = getSeason(new Date().getMonth());
-
-      const seasonalItems = items.filter(item =>
-        item.seasonality && item.seasonality.includes(currentSeason)
-      );
-
-      function getRandomItems(array, count) {
-        const shuffled = [...array].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, Math.min(count, array.length));
-      }
-      const displayedItems = getRandomItems(seasonalItems, 8);
-
+      // IMPORTANTE: Qui usiamo ancora l'array 'items' completo.
+      // In questo modo, il pannello laterale può trovare i dati di QUALSIASI
+      // immagine, anche quelle non visualizzate nella griglia.
       const allItems = {
-        ${items.map(item => `'${item.id}': ${JSON.stringify(item)}`).join(',\n')}
+        ${items.map(item => `'${item.id}': ${JSON.stringify(item)}`).join(',\n')
       };
 
       document.addEventListener('DOMContentLoaded', () => {
-        document.querySelector('h2').textContent = currentSeason;
-
-        const imageCanvas = document.querySelector('.image-canvas');
-        imageCanvas.innerHTML = '';
-        displayedItems.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.dataset.id = item.id;
-          if (item.image) {
-            const img = document.createElement('img');
-            img.src = item.image;
-            img.alt = item.name;
-            card.appendChild(img);
-          }
-          imageCanvas.appendChild(card);
-        });
-
-        // --- PANNELLO ---
+        const cards = document.querySelectorAll('.card');
+        
         const sidePanel = document.getElementById('sidePanel');
         const panelOverlay = document.getElementById('panelOverlay');
         const closePanelBtn = document.getElementById('closePanelBtn');
@@ -258,12 +217,12 @@ const dataCorrente = `${day} ${month} ${year}`;
         const panelDescription = document.getElementById('panelDescription');
         const panelCategories = document.getElementById('panelCategories');
 
-        function openPanel(item) {
+        const openPanel = (item) => {
           if (!item) return;
           panelImage.src = item.image || '';
           panelImage.alt = item.name || '';
-          panelTitle.textContent = item.name || 'Senza titolo';
-          panelDescription.textContent = item.description || 'Nessuna descrizione disponibile.';
+          panelTitle.textContent = item.name || 'No Title';
+          panelDescription.textContent = item.description || 'No Description';
           panelCategories.innerHTML = '';
           [item.category, item.region, item.seasonality, item.producers].filter(Boolean).forEach(cat => {
             const span = document.createElement('span');
@@ -274,36 +233,21 @@ const dataCorrente = `${day} ${month} ${year}`;
           panelOverlay.classList.add('open');
           sidePanel.classList.add('open');
           document.body.classList.add('panel-open');
-        }
-
-        function closePanel() {
+        };
+        const closePanel = () => {
           panelOverlay.classList.remove('open');
           sidePanel.classList.remove('open');
           document.body.classList.remove('panel-open');
-        }
-
-        imageCanvas.querySelectorAll('.card').forEach(card => {
+        };
+        cards.forEach(card => {
           card.addEventListener('click', () => {
             const itemId = card.dataset.id;
             const itemData = allItems[itemId];
             openPanel(itemData);
           });
         });
-
         closePanelBtn.addEventListener('click', closePanel);
         panelOverlay.addEventListener('click', closePanel);
-
-        // --- OROLOGIO LIVE ---
-        const clock = document.getElementById('clock');
-        function updateClock() {
-          const now = new Date();
-          const hours = now.getHours().toString().padStart(2, '0');
-          const minutes = now.getMinutes().toString().padStart(2, '0');
-          const seconds = now.getSeconds().toString().padStart(2, '0');
-          clock.textContent = `${hours}:${minutes}:${seconds}`;
-        }
-        updateClock();
-        setInterval(updateClock, 1000);
       });
     </script>
 
@@ -343,6 +287,7 @@ const dataCorrente = `${day} ${month} ${year}`;
           submitBtn.textContent = 'Invia contributo';
         }
       });
+
     </script>
   </body>
 </html>
