@@ -1,0 +1,238 @@
+---
+// src/pages/items/[id].astro
+
+import Airtable from 'airtable';
+
+export async function getStaticPaths() {
+  const base = new Airtable({
+    apiKey: import.meta.env.PUBLIC_AIRTABLE_API_KEY
+  }).base(import.meta.env.PUBLIC_AIRTABLE_BASE_ID);
+
+  const records = await base(import.meta.env.PUBLIC_AIRTABLE_TABLE_NAME).select().all();
+
+  return records.map(record => {
+    return {
+      params: { id: record.id },
+      props: {
+        item: {
+          name: record.fields.Name,
+          description: record.fields.Description,
+          image: record.fields.Edited?.[0]?.url,
+          category: record.fields.Category,
+          region: record.fields.Region,
+          producers: record.fields.Producers,
+        }
+      },
+    };
+  });
+}
+
+const { item } = Astro.props;
+---
+
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{item ? item.name : 'Dettaglio'}</title>
+
+  <style>
+    :root {
+      --padding-vertical: 40px;
+      --padding-horizontal-col-left: 40px;
+      --padding-horizontal-col-right: 20px;
+    }
+
+    body {
+      background-color: #D2B48C;
+      color: #3D2B1F;
+      font-family: system-ui, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .details-layout {
+      display: flex;
+      height: 100vh;
+    }
+
+    .column-left {
+      flex: 1;
+      padding: var(--padding-vertical) var(--padding-horizontal-col-left);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .column-left img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .back-link {
+      position: absolute;
+      top: var(--padding-vertical);
+      left: var(--padding-horizontal-col-left);
+      font-size: 2.5em;
+      line-height: 1;
+      color: #3D2B1F;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+    .back-link:hover {
+      transform: scale(1.15);
+    }
+
+    .column-right {
+      flex: 1;
+      padding-top: var(--padding-vertical);
+      padding-bottom: var(--padding-vertical);
+      padding-left: var(--padding-horizontal-col-right);
+      padding-right: var(--padding-horizontal-col-right);
+      border-left: 2px solid #3D2B1F;
+      overflow-y: auto;
+      /* Imposta la colonna come un container flex verticale */
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 3.5em;
+      margin: 0;
+      line-height: 1.1;
+      padding: 20px;
+    }
+
+    .separator {
+      border: none;
+      height: 2px;
+      background-color: #3D2B1F;
+      flex-shrink: 0; /* Impedisce al separatore di restringersi */
+      margin: 20px calc(-1 * var(--padding-horizontal-col-right));
+    }
+
+    .tags {
+      display: flex;
+      align-items: center; /* Allinea verticalmente i tag e il separatore */
+    }
+
+    .tag {
+      font-size: 0.8em;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+   
+    .vertical-separator {
+      width: 2px;
+      background-color: #3D2B1F;
+      height: 1.2em; /* Altezza del separatore */
+      margin: 0 1rem; /* Spazio ai lati del separatore */
+    }
+
+    p.description {
+      font-size: 1.1em;
+      white-space: pre-wrap;
+      margin-top: 0;
+      margin-bottom: 0;
+      /* Fa sì che la descrizione occupi tutto lo spazio verticale disponibile */
+      flex-grow: 1;
+    }
+   
+    .ricette {
+      font-size: 0.8em;
+      font-weight: 800;
+      margin: 0px;
+      padding: 0px;
+      /*text-transform: uppercase;*/
+    }
+
+    .producers-container {
+      /* Questo blocco ora è correttamente in fondo 
+      padding-top: 40px; /* Spazio tra descrizione e produttori */
+      flex-shrink: 0;
+    }
+
+    .producers-info .tag {
+        display: block;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        overflow: auto;
+      }
+      .details-layout {
+        flex-direction: column;
+        height: auto;
+      }
+      .column-left {
+        max-height: 60vh;
+        padding-top: 80px;
+      }
+      .column-right {
+        border-left: none;
+        overflow-y: visible;
+      }
+      .back-link {
+        top: 20px;
+        left: 20px;
+      }
+      .separator {
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .producers-container {
+          margin-top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+    {item ? (
+      <main class="details-layout">
+
+        <div class="column-left">
+          <a href="/" class="back-link" title="Torna all'archivio">←</a>
+          {item.image && <img src={item.image} alt={item.name} />}
+        </div>
+
+        <div class="column-right">
+          <h1>{item.name}</h1>
+          <hr class="separator" />
+          <div class="tags">
+              {item.category && <span class="tag">{item.category}</span>}
+              {item.category && item.region && <div class="vertical-separator"></div>}
+              {item.region && <span class="tag">{item.region}</span>}
+          </div>
+          <hr class="separator" />
+
+          <p class="description">{item.description}</p>
+
+          <hr class="separator" />
+          <div class="ricette">
+            <p> RECEPIES</p>
+          </div>
+
+          {item.producers && (
+            <div class="producers-container">
+              <hr class="separator" />
+              <div class="producers-info">
+                  <span class="tag">{item.producers}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+      </main>
+    ) : (
+      <div style="padding: 40px;">
+        <a href="/" class="back-link">←</a>
+        <h1>Elemento non trovato</h1>
+      </div>
+    )}
+</body>
+</html>

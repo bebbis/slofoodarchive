@@ -1,5 +1,6 @@
 ---
-// la riga in questi trattini dice all'indice quali devono essere le caratteristiche di base
+// src/pages/index.astro
+
 import Airtable from 'airtable';
 
 // Configura Airtable
@@ -18,10 +19,7 @@ try {
     id: record.id,
     name: record.fields.Name,
     description: record.fields.Description,
-    // --- MODIFICA QUI ---
-    // L'immagine ora viene presa dalla colonna 'Edited' invece che 'Image'.
     image: record.fields.Edited?.[0]?.url,
-    // --------------------
     category: record.fields.Category,
     region: record.fields.Region,
     seasonality: record.fields.Seasonality,
@@ -31,30 +29,26 @@ try {
   console.error('Errore caricamento dati:', error);
 }
 
-// --- NUOVA LOGICA PER SELEZIONARE 10 IMMAGINI RANDOM ---
+// --- Seleziona 10 immagini random ---
 const shuffledItems = [...items].sort(() => 0.5 - Math.random());
 const randomItems = shuffledItems.slice(0, 10);
 
-// --- LOGICA PER LA DATA E L'ORA IN INGLESE ---
+// --- Logica per la data ---
 const now = new Date();
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const day = now.getDate();
 const month = months[now.getMonth()];
 const year = now.getFullYear();
 const dataCorrente = `${day} ${month} ${year}`;
-const hours = now.getHours().toString().padStart(2, '0');
-const minutes = now.getMinutes().toString().padStart(2, '0');
-const seconds = now.getSeconds().toString().padStart(2, '0');
-const oraCorrente = `${hours}:${minutes}:${seconds}`;
 ---
 
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
+    <title>Archivio</title>
 
     <style>
       /* --- IMPOSTAZIONI GLOBALI --- */
@@ -68,23 +62,21 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         line-height: 1.6; margin: 0; padding: 0; overflow-x: hidden;
       }
-      body.panel-open { overflow: hidden; }
 
-      /* --- TIPOGRAFIA (MODIFICATO) --- */
+      /* --- TIPOGRAFIA --- */
       h1 {
         font-size: 70px;
         font-weight: 700;
         text-align: center;
         line-height: 1.2;
-        margin: 40px 0; /* Aggiunto spazio sopra e sotto */
+        margin: 40px 0;
         padding: 0;
         color: #D2B48C;
       }
 
-      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI (MODIFICATO) --- */
+      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI --- */
       .image-canvas {
         display: grid;
-        /* MODIFICA QUI: Ridotto il valore minmax per rendere le immagini più piccole */
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 20px;
         padding: 20px;
@@ -92,11 +84,17 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         margin: 0 auto;
       }
 
-      /* --- STILE DEL CONTENITORE 'card' (MODIFICATO) --- */
+      /* Stile per i link delle card */
+      .card-link {
+        text-decoration: none;
+        display: block;
+      }
+
+      /* --- STILE DEL CONTENITORE 'card' --- */
       .card {
-        position: relative; /* Già corretto per evitare sovrapposizioni */
+        position: relative;
         width: 100%;
-        aspect-ratio: 1 / 1; /* Mantiene le card quadrate */
+        aspect-ratio: 1 / 1;
         overflow: hidden;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -105,17 +103,8 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         width: 100%; height: 100%; object-fit: cover; display: block;
       }
       .card:hover {
-        z-index: 10;
         transform: scale(1.1);
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      }
-      
-      /* --- ETICHETTE (usate nel pannello) --- */
-      .category {
-        display: inline-block; font-size: 0.8rem; padding: 0.2rem 0.5rem;
-        border: 1px solid #D2B48C;
-        margin: 0.2rem;
-        color: #D2B48C;
       }
       
       /* --- FORM DI CONTRIBUTO --- */
@@ -143,47 +132,19 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
       .form-message.success { background-color: #e0f8e0; border: 1px solid #5cb85c; color: #333; }
       .form-message.error { background-color: #f8e0e0; border: 1px solid #d9534f; color: #333; }
 
-      /* --- PANNELLO LATERALE --- */
-      .panel-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); z-index: 99;
-        opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease;
-      }
-      .panel-overlay.open { opacity: 1; visibility: visible; }
-      .side-panel {
-        position: fixed; top: 0; right: 0; width: 50vw; height: 100vh;
-        background-color: #3D2B1F; border-left: 1px solid #D2B48C;
-        box-shadow: -4px 0 15px rgba(0,0,0,0.1); z-index: 100;
-        transform: translateX(100%); transition: transform 0.4s ease-in-out;
-        padding: 40px; box-sizing: border-box; overflow-y: auto;
-      }
-      .side-panel.open { transform: translateX(0); }
-      .panel-close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 28px; cursor: pointer; color: #D2B48C; }
-      .panel-image { width: 100%; max-height: 40vh; object-fit: cover; margin-bottom: 20px; }
-      .panel-title { font-size: 2em; margin: 0 0 10px 0; color: #D2B48C; }
-      .panel-description { margin: 0 0 20px 0; }
-      .panel-categories { border-top: 1px solid #5a4a3a; padding-top: 15px; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <h1>{dataCorrente}</h1>
     
     <div class="image-canvas">
-      {/* MODIFICA QUI: Usiamo 'randomItems' (i 10 scelti a caso) invece di 'items' */}
       {randomItems.map(item => (
-        <div class="card" data-id={item.id}>
-          {item.image && <img src={item.image} alt={item.name} />}
-        </div>
+        <a href={`/items/${item.id}`} class="card-link">
+          <div class="card">
+            {item.image && <img src={item.image} alt={item.name} />}
+          </div>
+        </a>
       ))}
-    </div>
-
-    <div id="panelOverlay" class="panel-overlay"></div>
-    <div id="sidePanel" class="side-panel">
-      <button id="closePanelBtn" class="panel-close-btn">&times;</button>
-      <img id="panelImage" src="" alt="" class="panel-image" />
-      <h2 id="panelTitle" class="panel-title"></h2>
-      <p id="panelDescription" class="panel-description"></p>
-      <div id="panelCategories" class="panel-categories"></div>
     </div>
 
     <details class="contribute-section">
@@ -197,59 +158,6 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
         <div id="form-message" class="form-message"></div>
       </form>
     </details>
-
-    <script is:inline>
-      // IMPORTANTE: Qui usiamo ancora l'array 'items' completo.
-      // In questo modo, il pannello laterale può trovare i dati di QUALSIASI
-      // immagine, anche quelle non visualizzate nella griglia.
-      const allItems = {
-        ${items.map(item => `'${item.id}': ${JSON.stringify(item)}`).join(',\n')
-      };
-
-      document.addEventListener('DOMContentLoaded', () => {
-        const cards = document.querySelectorAll('.card');
-        
-        const sidePanel = document.getElementById('sidePanel');
-        const panelOverlay = document.getElementById('panelOverlay');
-        const closePanelBtn = document.getElementById('closePanelBtn');
-        const panelImage = document.getElementById('panelImage');
-        const panelTitle = document.getElementById('panelTitle');
-        const panelDescription = document.getElementById('panelDescription');
-        const panelCategories = document.getElementById('panelCategories');
-
-        const openPanel = (item) => {
-          if (!item) return;
-          panelImage.src = item.image || '';
-          panelImage.alt = item.name || '';
-          panelTitle.textContent = item.name || 'No Title';
-          panelDescription.textContent = item.description || 'No Description';
-          panelCategories.innerHTML = '';
-          [item.category, item.region, item.seasonality, item.producers].filter(Boolean).forEach(cat => {
-            const span = document.createElement('span');
-            span.className = 'category';
-            span.textContent = cat;
-            panelCategories.appendChild(span);
-          });
-          panelOverlay.classList.add('open');
-          sidePanel.classList.add('open');
-          document.body.classList.add('panel-open');
-        };
-        const closePanel = () => {
-          panelOverlay.classList.remove('open');
-          sidePanel.classList.remove('open');
-          document.body.classList.remove('panel-open');
-        };
-        cards.forEach(card => {
-          card.addEventListener('click', () => {
-            const itemId = card.dataset.id;
-            const itemData = allItems[itemId];
-            openPanel(itemData);
-          });
-        });
-        closePanelBtn.addEventListener('click', closePanel);
-        panelOverlay.addEventListener('click', closePanel);
-      });
-    </script>
 
     <script is:inline>
       document.getElementById('contribute-form')?.addEventListener('submit', async (e) => {
@@ -287,7 +195,6 @@ const oraCorrente = `${hours}:${minutes}:${seconds}`;
           submitBtn.textContent = 'Invia contributo';
         }
       });
-
     </script>
-  </body>
+</body>
 </html>
