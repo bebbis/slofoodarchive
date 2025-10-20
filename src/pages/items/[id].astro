@@ -28,6 +28,15 @@ export async function getStaticPaths() {
 }
 
 const { item } = Astro.props;
+
+// --- Dati di esempio per le ricette ---
+const mockRecipes = [
+  { id: 1, title: "Insalata Fresca con Noci", instructions: "1. Lava e asciuga l'insalata.\n2. Aggiungi le noci e un filo d'olio.\n3. Condisci con sale e aceto balsamico." },
+  { id: 2, title: "Pasta al Pomodoro Semplice", instructions: "1. Cuoci la pasta.\n2. Prepara un sugo con pomodori freschi, aglio e basilico.\n3. Salta la pasta nel sugo e servi con parmigiano." },
+  { id: 3, title: "Zuppa Rustica", instructions: "1. Soffriggi cipolla e carote.\n2. Aggiungi legumi e brodo vegetale.\n3. Cuoci a fuoco lento per 45 minuti." },
+  { id: 4, title: "Bruschetta Classica", instructions: "1. Tosta delle fette di pane.\n2. Strofina uno spicchio d'aglio sul pane caldo.\n3. Condisci con pomodorini a cubetti, basilico, olio e sale." },
+  { id: 5, title: "Frullato Energizzante", instructions: "1. Metti nel frullatore la frutta scelta con yogurt o latte.\n2. Aggiungi un cucchiaio di miele.\n3. Frulla fino ad ottenere una consistenza cremosa." },
+];
 ---
 
 <html lang="it">
@@ -41,7 +50,7 @@ const { item } = Astro.props;
   <style>
     :root {
       --padding-vertical: 40px;
-      --padding-horizontal-col-left: 40px;
+      --padding-horizontal-col-left: 20px;
       --padding-horizontal-col-right: 20px;
     }
 
@@ -89,35 +98,36 @@ const { item } = Astro.props;
 
     .column-right {
       flex: 1;
-      padding-top: var(--padding-vertical);
-      padding-bottom: var(--padding-vertical);
-      padding-left: var(--padding-horizontal-col-right);
-      padding-right: var(--padding-horizontal-col-right);
-      border-left: 2px solid #3D2B1F;
-      overflow-y: auto;
-      /* Imposta la colonna come un container flex verticale */
+      border-left: 1px solid #3D2B1F;
+      overflow-y: hidden; /* Nasconde lo scroll principale della colonna */
       display: flex;
       flex-direction: column;
+    }
+
+    .column-right-content {
+        padding: var(--padding-vertical) var(--padding-horizontal-col-right);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     h1 {
       font-size: 3.5em;
       margin: 0;
       line-height: 1.1;
-      padding: 20px;
     }
 
     .separator {
       border: none;
-      height: 2px;
+      height: 1px;
       background-color: #3D2B1F;
-      flex-shrink: 0; /* Impedisce al separatore di restringersi */
+      flex-shrink: 0;
       margin: 20px calc(-1 * var(--padding-horizontal-col-right));
     }
 
     .tags {
       display: flex;
-      align-items: center; /* Allinea verticalmente i tag e il separatore */
+      align-items: center;
     }
 
     .tag {
@@ -125,44 +135,75 @@ const { item } = Astro.props;
       font-weight: 800;
       text-transform: uppercase;
     }
-
    
     .vertical-separator {
-      width: 2px;
+      width: 1px;
       background-color: #3D2B1F;
-      height: 1.2em; /* Altezza del separatore */
-      margin: 0 1rem; /* Spazio ai lati del separatore */
+      height: 1.2em;
+      margin: 0 1rem;
+    }
+    
+    .content-wrapper {
+        /*flex-grow: 1; /* Occupa tutto lo spazio disponibile */
+        overflow-y: auto; /* Rende solo quest'area scorrevole */
+        padding-right: 10px; /* Spazio per la barra di scorrimento */
+        height: 150px;
     }
 
     p.description {
+      flex-grow: 1; /* Occupa tutto lo spazio disponibile */
       font-size: 1.1em;
       white-space: pre-wrap;
-      margin-top: 0;
-      margin-bottom: 0;
-      /* Fa sì che la descrizione occupi tutto lo spazio verticale disponibile */
-      flex-grow: 1;
-    }
-   
-    .ricette {
-      font-size: 0.8em;
-      font-weight: 800;
-      margin: 0px;
-      padding: 0px;
-      /*text-transform: uppercase;*/
+      margin: 0 0 40px 0;
     }
 
+    .recipes-section {
+        margin-bottom: 40px;
+    }
+
+    .recipes-heading {
+      font-size: 0.8em;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 0 0 10px 0;
+    }
+    
+    .recipe-item {
+        border-bottom: 1px solid #3D2B1F;
+    }
+    .recipe-item summary {
+        cursor: pointer;
+        padding: 0px 0;
+        margin: 0;
+        font-weight: medium;
+        list-style: none; /* Rimuove il marcatore di default */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .recipe-item summary::after {
+        content: '+'; /* Simbolo quando chiuso */
+        font-size: 1.5em;
+        font-weight: normal;
+    }
+    .recipe-item[open] > summary::after {
+       font-weight: bold;
+       content: '−'; /* Simbolo quando aperto */
+    }
+    .recipe-content {
+        padding: 0 10px 20px 10px;
+        white-space: pre-wrap;
+    }
+   
     .producers-container {
-      /* Questo blocco ora è correttamente in fondo 
-      padding-top: 40px; /* Spazio tra descrizione e produttori */
       flex-shrink: 0;
     }
 
     .producers-info .tag {
         display: block;
     }
-
     @media (max-width: 900px) {
-      body {
+      body, .column-right, .content-wrapper {
         overflow: auto;
       }
       .details-layout {
@@ -175,7 +216,6 @@ const { item } = Astro.props;
       }
       .column-right {
         border-left: none;
-        overflow-y: visible;
       }
       .back-link {
         top: 20px;
@@ -184,9 +224,6 @@ const { item } = Astro.props;
       .separator {
         margin-left: 0;
         margin-right: 0;
-      }
-      .producers-container {
-          margin-top: 0;
       }
     }
   </style>
@@ -201,30 +238,42 @@ const { item } = Astro.props;
         </div>
 
         <div class="column-right">
-          <h1>{item.name}</h1>
-          <hr class="separator" />
-          <div class="tags">
-              {item.category && <span class="tag">{item.category}</span>}
-              {item.category && item.region && <div class="vertical-separator"></div>}
-              {item.region && <span class="tag">{item.region}</span>}
-          </div>
-          <hr class="separator" />
-
-          <p class="description">{item.description}</p>
-
-          <hr class="separator" />
-          <div class="ricette">
-            <p> RECEPIES</p>
-          </div>
-
-          {item.producers && (
-            <div class="producers-container">
-              <hr class="separator" />
-              <div class="producers-info">
-                  <span class="tag">{item.producers}</span>
-              </div>
+          <div class="column-right-content">
+            
+            <h1>{item.name}</h1>
+            <hr class="separator" />
+            
+            <div class="tags">
+                {item.category && <span class="tag">{item.category}</span>}
+                {item.category && item.region && <div class="vertical-separator"></div>}
+                {item.region && <span class="tag">{item.region}</span>}
             </div>
-          )}
+            
+            <p class="description">{item.description}</p>
+            <hr class="separator" />
+           
+            <h2 class="recipes-heading">RECEPIES</h2>
+            <div class="content-wrapper">
+                <div class="recipes-section">
+                   
+                    {mockRecipes.map(recipe => (
+                        <details class="recipe-item">
+                            <summary>{recipe.title}</summary>
+                            <div class="recipe-content">{recipe.instructions}</div>
+                        </details>
+                    ))}
+                </div>
+            </div>
+
+            {item.producers && (
+              <div class="producers-container">
+                <hr class="separator" />
+                <div class="producers-info">
+                    <span class="tag">{item.producers}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
       </main>
