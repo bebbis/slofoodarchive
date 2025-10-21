@@ -1,6 +1,5 @@
 ---
-// src/pages/index.astro
-
+// la riga in questi trattini dice all'indice quali devono essere le caratteristiche di base
 import Airtable from 'airtable';
 
 // Configura Airtable
@@ -29,17 +28,16 @@ try {
   console.error('Errore caricamento dati:', error);
 }
 
-// --- Seleziona 10 immagini random ---
+// Mescola TUTTE le immagini
 const shuffledItems = [...items].sort(() => 0.5 - Math.random());
-const randomItems = shuffledItems.slice(0, 10);
 
 // --- Logica per la data ---
 const now = new Date();
-const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const day = now.getDate();
 const month = months[now.getMonth()];
 const year = now.getFullYear();
-const dataCorrente = `${day} ${month} ${year}`;
+const dataCorrente = `${day} ${month}`;
 ---
 
 <html lang="en">
@@ -57,107 +55,259 @@ const dataCorrente = `${day} ${month} ${year}`;
       }
       
       body {
-        background-color: #463529;
-        color: #d3a76e;
+        background-color: #ffffff;
+        color: #ff6600;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        line-height: 1.6; margin: 0; padding: 0; overflow-x: hidden;
+        line-height: 1.6; margin: 0; padding: 0; 
+        overflow: hidden; 
       }
 
-      /* --- TIPOGRAFIA --- */
+
+      /* --- HEADER SITO --- */
+      .site-header {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0px; 
+        margin: 0px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #ff6600;
+      }  
+      .site-header h3 {
+        margin: 0;
+      }
+
+      /* --- CONTENITORE DATA DI SFONDO --- */
+      .date-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* --- TIPOGRAFIA (H1) --- */
       h1 {
-        font-size: 70px;
+        font-size: 25vmin; 
         font-weight: 700;
         text-align: center;
-        line-height: 1.2;
-        margin: 40px 0;
+        line-height: 0.8;
+        margin: 0;
         padding: 0;
-        color: #D2B48C;
+        color: #ff6600;
+        user-select: none;
+        white-space: nowrap;
       }
 
-      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI --- */
+      /* --- CONTENITORE IMMAGINI (MODIFICATO) --- */
       .image-canvas {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 20px;
-        padding: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+        margin: 0 20px;
+        height: calc(100vh - 160px); 
+        overflow:hidden;
       }
 
-      /* Stile per i link delle card */
+      /* --- Stile per i link delle card (MODIFICATO) --- */
       .card-link {
         text-decoration: none;
         display: block;
+        position: absolute;
+        cursor: pointer; /* Cambiato in 'pointer' */
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+      }
+      
+      .card-link.is-visible {
+        opacity: 1;
+        transform: scale(1);
       }
 
       /* --- STILE DEL CONTENITORE 'card' --- */
       .card {
         position: relative;
         width: 100%;
-        aspect-ratio: 1 / 1;
-        overflow: hidden;
-        cursor: pointer;
-        transition: none;
+        transition: transform 0.2s ease;
+        color: #ff6600;
+        pointer-events: none; /* Eventi passano al .card-link */
       }
       .card img {
-        width: 100%; height: 100%; object-fit: cover; display: block;
+        width: 100%; 
+        height: auto;
+        display: block;
+        box-shadow: none;
       }
-      .card:hover {
+      
+      .card-link.is-visible:hover .card {
         transform: scale(1.1);
         box-shadow: none;
       }
       
       /* --- FORM DI CONTRIBUTO --- */
       .contribute-section { position: fixed; bottom: 20px; right: 20px; z-index: 101; font-size: 14px; }
-      .contribute-section summary {
-        cursor: pointer; padding: 8px 12px; background-color: #3D2B1F;
-        border: 1px solid #D2B48C; color: #D2B48C; display: inline-block;
-      }
-      .contribute-form {
-        margin-top: 10px; padding: 20px; background-color: #3D2B1F;
-        border: 1px solid #D2B48C; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      }
+      .contribute-section summary { cursor: pointer; padding: 8px 12px; background-color: #3D2B1F; border: 1px solid #D2B48C; color: #D2B48C; display: inline-block; }
+      .contribute-form { margin-top: 10px; padding: 20px; background-color: #3D2B1F; border: 1px solid #D2B48C; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
       .form-group { margin-bottom: 15px; }
       .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-      .form-group input, .form-group textarea, .form-group select {
-        width: 100%; padding: 8px; border: 1px solid #D2B48C;
-        background-color: #4a3a2a; color: #D2B48C; box-sizing: border-box;
-      }
-      .submit-btn {
-        width: 100%; padding: 10px; background-color: #D2B48C;
-        color: #3D2B1F; border: none; cursor: pointer; font-size: 1em; font-weight: bold;
-      }
+      .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; border: 1px solid #D2B48C; background-color: #4a3a2a; color: #D2B48C; box-sizing: border-box; }
+      .submit-btn { width: 100%; padding: 10px; background-color: #D2B48C; color: #3D2B1F; border: none; cursor: pointer; font-size: 1em; font-weight: bold; }
       .submit-btn:disabled { background-color: #888; }
       .form-message { margin-top: 10px; padding: 10px; }
       .form-message.success { background-color: #e0f8e0; border: 1px solid #5cb85c; color: #333; }
       .form-message.error { background-color: #f8e0e0; border: 1px solid #d9534f; color: #333; }
-
     </style>
 </head>
 <body>
+  <header class="site-header">
+    <h3>SLOW FOOD ARCHIVE {year}</h3>
+  </header>
+  
+  <div class="date-background">
     <h1>{dataCorrente}</h1>
-    
-    <div class="image-canvas">
-      {randomItems.map(item => (
-        <a href={`/items/${item.id}`} class="card-link">
-          <div class="card">
-            {item.image && <img src={item.image} alt={item.name} />}
-          </div>
-        </a>
-      ))}
-    </div>
+  </div>
+  
+  <div class="image-canvas">
+    {shuffledItems.map(item => (
+      
+      <a href={`/items/${item.id}`} class="card-link" draggable="false"> 
+        
+        <div class="card">
+          
+          {item.image && <img src={item.image} alt={item.name} draggable="false" />} 
+        
+        </div>
+      </a>
+    ))}
+  </div>
 
-    <details class="contribute-section">
-      <summary>Vuoi contribuire all'archivio?</summary>
-      <form id="contribute-form" class="contribute-form">
-        <div class="form-group"><label for="title">Titolo *</label><input type="text" id="title" name="title" required /></div>
-        <div class="form-group"><label for="description">Descrizione *</label><textarea id="description" name="description" rows="4" required></textarea></div>
-        <div class="form-group"><label for="category">Categoria</label><select id="category" name="category"><option value="">Seleziona...</option><option value="Neri">Neri</option><option value="Siamesi">Siamesi</option><option value="Europei">Europei</option><option value="Altro">Altro</option></select></div>
-        <div class="form-group"><label for="image-url">URL Immagine</label><input type="url" id="image-url" name="imageUrl" placeholder="https://esempio.com/immagine.jpg" /><small>Inserisci il link di un'immagine già online.</small></div>
-        <button type="submit" class="submit-btn">Invia contributo</button>
-        <div id="form-message" class="form-message"></div>
-      </form>
-    </details>
+ 
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.querySelector('.image-canvas');
+        const cards = document.querySelectorAll('.card-link');
+        
+        const minCardWidth = 80;
+        const maxCardWidth = 180;
+        
+        const canvasWidth = canvas.offsetWidth;
+        const canvasHeight = canvas.offsetHeight;
+        
+        const delayIncrement = 200; // Ritardo
+
+        // --- 1. POSIZIONAMENTO E APPARIZIONE STAGGERATA ---
+        cards.forEach((card, index) => {
+          const randWidth = Math.floor(Math.random() * (maxCardWidth - minCardWidth + 1)) + minCardWidth;
+          card.style.width = `${randWidth}px`;
+          
+          const randX = Math.random() * (canvasWidth - randWidth);
+          const estimatedCardHeight = randWidth * 1.2; 
+          const randY = Math.random() * (canvasHeight - estimatedCardHeight); 
+          const randZ = Math.floor(Math.random() * cards.length);
+
+          card.style.left = `${randX}px`;
+          card.style.top = `${randY}px`;
+          card.style.zIndex = randZ;
+          card.dataset.originalZ = randZ; 
+
+          setTimeout(() => {
+            card.classList.add('is-visible');
+          }, index * delayIncrement);
+        });
+
+        // --- 2. LOGICA DRAG-AND-DROP (BLOCCO RE-INSERITO) ---
+        let activeCard = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let isDragging = false; // Flag per distinguere click da drag
+
+        function dragStart(e) {
+          activeCard = this; // 'this' è .card-link
+          isDragging = false; // Resetta il flag
+
+          // Ottieni coordinate iniziali (mouse o tocco)
+          const clientX = e.clientX || e.touches[0].clientX;
+          const clientY = e.clientY || e.touches[0].clientY;
+
+          // Calcola l'offset del mouse dall'angolo in alto a sx della card
+          offsetX = clientX - parseFloat(activeCard.style.left);
+          offsetY = clientY - parseFloat(activeCard.style.top);
+
+          // Porta la card in primo piano
+          activeCard.style.zIndex = 1000;
+          activeCard.style.cursor = 'grabbing';
+          
+          // Aggiungi i listener al documento intero per continuare il drag
+          document.addEventListener('mousemove', dragMove);
+          document.addEventListener('mouseup', dragEnd);
+          document.addEventListener('touchmove', dragMove, { passive: false });
+          document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+          if (!activeCard) return;
+          isDragging = true; // Se il mouse si muove, è un drag
+
+          // Previene lo scroll della pagina su mobile (anche se è bloccato)
+          e.preventDefault();
+
+          const clientX = e.clientX || e.touches[0].clientX;
+          const clientY = e.clientY || e.touches[0].clientY;
+
+          // Calcola nuova posizione
+          let newLeft = clientX - offsetX;
+          let newTop = clientY - offsetY;
+
+          // Limita il movimento ai bordi del canvas
+          const cardRect = activeCard.getBoundingClientRect();
+          
+          newLeft = Math.max(0, Math.min(newLeft, canvasWidth - cardRect.width));
+          newTop = Math.max(0, Math.min(newTop, canvasHeight - cardRect.height));
+
+          activeCard.style.left = `${newLeft}px`;
+          activeCard.style.top = `${newTop}px`;
+        }
+
+        function dragEnd() {
+          if (!activeCard) return;
+
+          // Ripristina z-index e cursore
+          activeCard.style.zIndex = activeCard.dataset.originalZ || 1;
+          activeCard.style.cursor = 'pointer';
+
+          // Rimuovi i listener dal documento
+          document.removeEventListener('mousemove', dragMove);
+          document.removeEventListener('mouseup', dragEnd);
+          document.removeEventListener('touchmove', dragMove);
+          document.removeEventListener('touchend', dragEnd);
+
+          activeCard = null;
+        }
+
+        // Assegna i listener a ogni card
+        cards.forEach(card => {
+          card.addEventListener('mousedown', dragStart);
+          card.addEventListener('touchstart', dragStart, { passive: false });
+
+          // Previene il click sul link se l'utente stava trascinando
+          card.addEventListener('click', (e) => {
+            if (isDragging) {
+              e.preventDefault(); // Blocca la navigazione
+            }
+          });
+        });
+
+      });
+    </script>
 
     <script is:inline>
       document.getElementById('contribute-form')?.addEventListener('submit', async (e) => {
