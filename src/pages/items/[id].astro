@@ -1,6 +1,4 @@
 ---
-// src/pages/items/[id].astro
-
 import Airtable from 'airtable';
 
 export async function getStaticPaths() {
@@ -29,256 +27,358 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 
-// --- Dati di esempio per le ricette ---
-const mockRecipes = [
-  { id: 1, title: "Insalata Fresca con Noci", instructions: "1. Lava e asciuga l'insalata.\n2. Aggiungi le noci e un filo d'olio.\n3. Condisci con sale e aceto balsamico." },
-  { id: 2, title: "Pasta al Pomodoro Semplice", instructions: "1. Cuoci la pasta.\n2. Prepara un sugo con pomodori freschi, aglio e basilico.\n3. Salta la pasta nel sugo e servi con parmigiano." },
-  { id: 3, title: "Zuppa Rustica", instructions: "1. Soffriggi cipolla e carote.\n2. Aggiungi legumi e brodo vegetale.\n3. Cuoci a fuoco lento per 45 minuti." },
-  { id: 4, title: "Bruschetta Classica", instructions: "1. Tosta delle fette di pane.\n2. Strofina uno spicchio d'aglio sul pane caldo.\n3. Condisci con pomodorini a cubetti, basilico, olio e sale." },
-  { id: 5, title: "Frullato Energizzante", instructions: "1. Metti nel frullatore la frutta scelta con yogurt o latte.\n2. Aggiungi un cucchiaio di miele.\n3. Frulla fino ad ottenere una consistenza cremosa." },
-];
+const recipeMap = {
+  'Ricotta': [
+    // ... ricette per la ricotta
+  ],
+  'Testaroli artigianali pontremolesi': [
+    {
+      name: 'Testaroli al Pesto Ligure',
+      serves: '4 people',
+      time: '15 minutes',
+      ingredients: ['400g Testaroli', '100g Pesto alla Genovese', '30g Pinoli', 'Parmigiano Reggiano', 'Olio extra vergine d\'oliva'],
+      steps: ['Lessare brevemente i testaroli in acqua bollente salata.', 'Scolarli e condirli immediatamente con il pesto, una generosa manciata di Parmigiano e i pinoli tostati.', 'Servire con un filo d\'olio a crudo.']
+    },
+    {
+      name: 'Testaroli con Sugo di Funghi Porcini',
+      serves: '4 people',
+      time: '40 minutes',
+      ingredients: ['400g Testaroli', '300g Funghi porcini freschi o surgelati', '1 spicchio d\'aglio', 'Prezzemolo fresco', 'Vino bianco secco', 'Olio extra vergine d\'oliva', 'Sale e pepe'],
+      steps: ['In una padella, soffriggere l\'aglio con l\'olio.', 'Aggiungere i funghi puliti e tagliati, farli rosolare.', 'Sfumare con vino bianco, poi cuocere per 20 minuti. Aggiungere prezzemolo tritato, sale e pepe.', 'Cuocere i testaroli, scolarli e saltarli nel sugo di funghi.']
+    },
+    {
+      name: 'Testaroli Gratinati con Besciamella e Prosciutto',
+      serves: '4 people',
+      time: '30 minutes',
+      ingredients: ['350g Testaroli', '500ml Besciamella', '100g Prosciutto cotto a cubetti', '80g Parmigiano Reggiano', 'Noce moscata', 'Burro'],
+      steps: ['Sbollentare i testaroli per un minuto.', 'In una teglia imburrata, creare strati alternando testaroli, besciamella, prosciutto e Parmigiano.', 'Concludere con uno strato di besciamella e Parmigiano.', 'Gratinare in forno a 200°C per 15 minuti.']
+    },
+    {
+      name: 'Testaroli con Ragù di Salsiccia e Finocchietto',
+      serves: '4 people',
+      time: '50 minutes',
+      ingredients: ['400g Testaroli', '300g Salsiccia fresca', '1/2 cipolla', '400g Pomodori pelati', 'Semi di finocchietto selvatico', 'Vino rosso', 'Olio extra vergine d\'oliva'],
+      steps: ['Soffriggere la cipolla tritata in olio.', 'Aggiungere la salsiccia sbriciolata e rosolare.', 'Sfumare con vino rosso, aggiungere i pelati e i semi di finocchietto.', 'Cuocere il ragù per 30-40 minuti.', 'Lessare i testaroli e condirli con il sugo.']
+    },
+    {
+      name: 'Testaroli ai Frutti di Mare',
+      serves: '4 people',
+      time: '35 minutes',
+      ingredients: ['350g Testaroli', '500g Misto di frutti di mare (cozze, vongole, gamberi)', '1 spicchio d\'aglio', 'Pomodorini ciligino', 'Prezzemolo', 'Vino bianco', 'Peperoncino'],
+      steps: ['Aprire cozze e vongole in padella.', 'In un\'altra padella, soffriggere aglio, olio e peperoncino.', 'Aggiungere i pomodorini e i gamberi, poi sfumare con vino bianco.', 'Unire cozze e vongole sgusciate, cuocere per pochi minuti.', 'Cuocere i testaroli e saltarli nel sugo di mare con prezzemolo fresco.']
+    },
+    {
+      name: 'Testaroli con Crema di Noci e Speck Croccante',
+      serves: '4 people',
+      time: '25 minutes',
+      ingredients: ['400g Testaroli', '100g Gherigli di noci', '50g Panna fresca liquida', '1 spicchio d\'aglio piccolo', '100g Speck a fette sottili', 'Parmigiano Reggiano'],
+      steps: ['Frullare le noci con aglio, panna, un po\' di Parmigiano e un filo d\'olio fino a ottenere una crema.', 'Rendere lo speck croccante in una padella antiaderente e sbriciolarlo.', 'Lessare i testaroli e condirli con la crema di noci.', 'Servire con lo speck croccante sopra.']
+    },
+    {
+      name: 'Testaroli con Fagioli Cannellini e Salvia',
+      serves: '4 people',
+      time: '20 minutes',
+      ingredients: ['350g Testaroli', '400g Fagioli cannellini in scatola', 'Foglie di salvia fresca', '1 spicchio d\'aglio', 'Olio extra vergine d\'oliva', 'Sale e pepe'],
+      steps: ['In una padella capiente, soffriggere aglio e salvia in abbondante olio.', 'Aggiungere i fagioli cannellini scolati e sciacquati, e farli insaporire per 5 minuti.', 'Cuocere i testaroli, scolarli e versarli nella padella con i fagioli.', 'Mantecare bene e servire con una macinata di pepe fresco.']
+    },
+    {
+      name: 'Insalata Estiva di Testaroli',
+      serves: '4 people',
+      time: '15 minutes',
+      ingredients: ['400g Testaroli', '200g Pomodorini', '150g Mozzarella di bufala', 'Olive taggiasche', 'Basilico fresco', 'Origano', 'Olio extra vergine d\'oliva'],
+      steps: ['Cuocere i testaroli, scolarli e lasciarli raffreddare leggermente.', 'Tagliarli a losanghe o quadrati.', 'Condirli in una ciotola con pomodorini a spicchi, mozzarella a cubetti, olive e basilico.', 'Aggiungere olio, sale, origano e mescolare delicatamente.']
+    },
+    {
+      name: 'Testaroli al Formaggio Blu e Pere',
+      serves: '4 people',
+      time: '20 minutes',
+      ingredients: ['350g Testaroli', '150g Gorgonzola dolce', '1 pera matura ma soda', '50ml Latte o panna', 'Gherigli di noci', 'Burro'],
+      steps: ['Sciogliere il gorgonzola a fuoco basso con il latte.', 'Tagliare la pera a cubetti piccoli.', 'Lessare i testaroli e scolarli.', 'Condirli con la fonduta di gorgonzola, aggiungere i cubetti di pera e le noci tritate grossolanamente.', 'Servire subito.']
+    },
+    {
+      name: 'Testaroli con Crema di Peperoni e Ricotta Affumicata',
+      serves: '4 people',
+      time: '45 minutes',
+      ingredients: ['400g Testaroli', '2 peperoni rossi grandi', '100g Ricotta affumicata', '1 spicchio d\'aglio', 'Mandorle a lamelle', 'Olio extra vergine d\'oliva'],
+      steps: ['Arrostire i peperoni in forno, poi spellarli e rimuovere i semi.', 'Frullare la polpa dei peperoni con aglio, un pizzico di sale e olio fino ad ottenere una crema liscia.', 'Tostare le mandorle in padella.', 'Cuocere i testaroli, condirli con la crema di peperoni e completare con scaglie di ricotta affumicata e mandorle tostate.']
+    }
+  ]
+};
+
+function getRecipes(productName) {
+  if (!productName) return [];
+  for (const [key, recipes] of Object.entries(recipeMap)) {
+    if (productName.toLowerCase().includes(key.toLowerCase())) {
+      return recipes;
+    }
+  }
+  return [];
+}
+
+const recipes = getRecipes(item?.name || '');
 ---
 
 <html lang="it">
-@ -41,7 +50,7 @@ const { item } = Astro.props;
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{item ? item.name : 'Dettaglio Prodotto'}</title>
+
   <style>
     :root {
-      --padding-vertical: 40px;
-      --padding-horizontal-col-left: 40px;
-      --padding-horizontal-col-left: 20px;
-      --padding-horizontal-col-right: 20px;
+      --padding-main: 40px;
+      --color-background: #d1c5ad;
+      --color-text-dark: #4a3f35;
+      --color-text-light: #6d5f53;
+      --color-highlight: #fd6814;
+      --color-border: rgba(74, 63, 53, 0.5);
     }
 
-@ -89,35 +98,36 @@ const { item } = Astro.props;
+    ::selection {
+      background: transparent;
+      color: var(--color-highlight);
+    }
 
-    .column-right {
-      flex: 1;
-      padding-top: var(--padding-vertical);
-      padding-bottom: var(--padding-vertical);
-      padding-left: var(--padding-horizontal-col-right);
-      padding-right: var(--padding-horizontal-col-right);
-      border-left: 2px solid #3D2B1F;
-      overflow-y: auto;
-      /* Imposta la colonna come un container flex verticale */
-      border-left: 1px solid #3D2B1F;
-      overflow-y: hidden; /* Nasconde lo scroll principale della colonna */
+    body {
+      background-color: var(--color-background);
+      color: var(--color-text-dark);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      line-height: 1.6;
+      margin: 0;
+      /* user-select: none; RIMOSSO */
+    }
+
+    .details-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 1fr;
+      height: 100vh;
+      position: relative;
+    }
+
+    .background-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+      font-size: 14vw;
+      font-weight: 600;
+      line-height: 1;
+      color: rgba(74, 63, 53, 0.08);
+      z-index: 1;
+      pointer-events: none;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .column {
+      padding: var(--padding-main);
+      z-index: 10;
       display: flex;
       flex-direction: column;
     }
 
-    .column-right-content {
-        padding: var(--padding-vertical) var(--padding-horizontal-col-right);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
+    .col-left {
+      justify-content: flex-start;
+      padding-top: 100px;
     }
-
-    h1 {
-      font-size: 3.5em;
-      margin: 0;
-      line-height: 1.1;
-      padding: 20px;
-    }
-
-    .separator {
-      border: none;
-      height: 2px;
-      height: 1px;
-      background-color: #3D2B1F;
-      flex-shrink: 0; /* Impedisce al separatore di restringersi */
-      flex-shrink: 0;
-      margin: 20px calc(-1 * var(--padding-horizontal-col-right));
-    }
-
-    .tags {
-      display: flex;
-      align-items: center; /* Allinea verticalmente i tag e il separatore */
+    .col-center {
+      border-left: 1px solid var(--color-border);
+      border-right: 1px solid var(--color-border);
       align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .col-center img {
+      max-width: 100%;
+      max-height: 100vh;
+      object-fit: contain;
+      mix-blend-mode: multiply;
     }
 
-    .tag {
-@ -125,44 +135,75 @@ const { item } = Astro.props;
-      font-weight: 800;
+    .col-right {
+      overflow-y: auto;
+    }
+
+    .back-link {
+      position: absolute;
+      top: var(--padding-main);
+      left: var(--padding-main);
+      font-size: 1.5em;
+      color: var(--color-text-dark);
+      text-decoration: none;
+      transition: transform 0.2s ease;
+      z-index: 20;
+    }
+    .back-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .info-block {
+      margin-bottom: 2rem;
+    }
+    .info-block h4 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+      font-size: 0.7em;
       text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--color-text-light);
     }
-
-   
-    .vertical-separator {
-      width: 2px;
-      width: 1px;
-      background-color: #3D2B1F;
-      height: 1.2em; /* Altezza del separatore */
-      margin: 0 1rem; /* Spazio ai lati del separatore */
-      height: 1.2em;
-      margin: 0 1rem;
-    }
-    
-    .content-wrapper {
-        /*flex-grow: 1; /* Occupa tutto lo spazio disponibile */
-        overflow-y: auto; /* Rende solo quest'area scorrevole */
-        padding-right: 10px; /* Spazio per la barra di scorrimento */
-        height: 150px;
-    }
-
-    p.description {
-      flex-grow: 1; /* Occupa tutto lo spazio disponibile */
-      font-size: 1.1em;
+    .info-block p, .info-block span {
+      margin: 0;
+      font-size: 1em;
       white-space: pre-wrap;
-      margin-top: 0;
-      margin-bottom: 0;
-      /* Fa sì che la descrizione occupi tutto lo spazio verticale disponibile */
-      flex-grow: 1;
-      margin: 0 0 40px 0;
-    }
-   
-    .ricette {
-
-    .recipes-section {
-        margin-bottom: 40px;
     }
 
-    .recipes-heading {
-      font-size: 0.8em;
-      font-weight: 800;
-      margin: 0px;
-      padding: 0px;
-      /*text-transform: uppercase;*/
-      text-transform: uppercase;
-      margin: 0 0 10px 0;
+    .accordion-item {
+      border-bottom: 1px solid rgba(74, 63, 53, 0.2);
     }
-
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 10px 0;
+    }
+    .accordion-header h4 {
+      margin: 0;
+      font-weight: 500;
+      font-size: 1em;
+    }
+    .accordion-header::after {
+      content: '+';
+      font-size: 1.5em;
+      font-weight: 300;
+      transition: transform 0.3s ease;
+    }
+    .accordion-header.active::after {
+      transform: rotate(45deg);
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out;
+    }
     
-    .recipe-item {
-        border-bottom: 1px solid #3D2B1F;
+    .accordion-content .content-inner {
+        padding: 15px 10px;
     }
-    .recipe-item summary {
-        cursor: pointer;
-        padding: 0px 0;
-        margin: 0;
-        font-weight: medium;
-        list-style: none; /* Rimuove il marcatore di default */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .accordion-content h4 {
+      margin-top: 0;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--color-text-light);
     }
-    .recipe-item summary::after {
-        content: '+'; /* Simbolo quando chiuso */
-        font-size: 1.5em;
-        font-weight: normal;
-    }
-    .recipe-item[open] > summary::after {
-       font-weight: bold;
-       content: '−'; /* Simbolo quando aperto */
-    }
-    .recipe-content {
-        padding: 0 10px 20px 10px;
-        white-space: pre-wrap;
-    }
-   
-    .producers-container {
-      /* Questo blocco ora è correttamente in fondo 
-      padding-top: 40px; /* Spazio tra descrizione e produttori */
-      flex-shrink: 0;
-    }
-
-    .producers-info .tag {
-        display: block;
-    }
-
-    @media (max-width: 900px) {
-      body {
-      body, .column-right, .content-wrapper {
-        overflow: auto;
-      }
-      .details-layout {
-@ -175,7 +216,6 @@ const { item } = Astro.props;
-      }
-      .column-right {
-        border-left: none;
-        overflow-y: visible;
-      }
-      .back-link {
-        top: 20px;
-@ -185,9 +225,6 @@ const { item } = Astro.props;
-        margin-left: 0;
-        margin-right: 0;
-      }
-      .producers-container {
-          margin-top: 0;
-      }
+    .accordion-content ul, .accordion-content ol {
+      padding-left: 20px;
+      margin: 0 0 15px 0;
     }
   </style>
 </head>
-@ -201,38 +238,50 @@
-        </div>
+<body>
+    {item ? (
+      <main class="details-layout">
+        
+        <h1 class="background-title">{item.name}</h1>
 
-        <div class="column-right">
-          <h1>{item.name}</h1>
-          <hr class="separator" />
-          <div class="tags">
-              {item.category && <span class="tag">{item.category}</span>}
-              {item.category && item.region && <div class="vertical-separator"></div>}
-              {item.region && <span class="tag">{item.region}</span>}
+        <a href="/" class="back-link" title="Torna alla home">←</a>
+
+        <div class="column col-left">
+          <div class="info-block">
+            <h4>Description</h4>
+            <p>{item.description}</p>
           </div>
-          <hr class="separator" />
-
-          <p class="description">{item.description}</p>
-
-          <hr class="separator" />
-          <div class="ricette">
-            <p> RECEPIES</p>
+          <div class="info-block">
+            <h4>Category</h4>
+            <p>{item.category}</p>
           </div>
-          <div class="column-right-content">
-            
-            <h1>{item.name}</h1>
-            <hr class="separator" />
-            
-            <div class="tags">
-                {item.category && <span class="tag">{item.category}</span>}
-                {item.category && item.region && <div class="vertical-separator"></div>}
-                {item.region && <span class="tag">{item.region}</span>}
-            </div>
-            
-            <p class="description">{item.description}</p>
-            <hr class="separator" />
-           
-            <h2 class="recipes-heading">RECEPIES</h2>
-            <div class="content-wrapper">
-                <div class="recipes-section">
-                   
-                    {mockRecipes.map(recipe => (
-                        <details class="recipe-item">
-                            <summary>{recipe.title}</summary>
-                            <div class="recipe-content">{recipe.instructions}</div>
-                        </details>
-                    ))}
-                </div>
-            </div>
-
+          <div class="info-block">
+            <h4>Region</h4>
+            <p>{item.region}</p>
+          </div>
           {item.producers && (
-            <div class="producers-container">
-              <hr class="separator" />
-              <div class="producers-info">
-                  <span class="tag">{item.producers}</span>
-            {item.producers && (
-              <div class="producers-container">
-                <hr class="separator" />
-                <div class="producers-info">
-                    <span class="tag">{item.producers}</span>
-                </div>
-              </div>
+            <div class="info-block">
+              <h4>Producers</h4>
+              <p>{item.producers}</p>
             </div>
           )}
-            )}
+        </div>
+
+        <div class="column col-center">
+          {item.image && <img src={item.image} alt={item.name} />}
+        </div>
+
+        <div class="column col-right">
+          <div class="info-block">
+            <h4>Recipes</h4>
           </div>
+          {recipes.length > 0 ? (
+            recipes.map(recipe => (
+              <div class="accordion-item">
+                <div class="accordion-header"><h4>{recipe.name}</h4></div>
+                <div class="accordion-content">
+                  <div class="content-inner">
+                    <h4>Serves</h4><p>{recipe.serves}</p>
+                    <h4>Time</h4><p>{recipe.time}</p>
+                    <h4>Ingredients</h4>
+                    <ul>
+                        {recipe.ingredients.map(ingredient => <li>{ingredient}</li>)}
+                    </ul>
+                    <h4>Steps</h4>
+                    <ol>
+                        {recipe.steps.map(step => <li>{step}</li>)}
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Nessuna ricetta disponibile per questo prodotto.</p>
+          )}
         </div>
 
       </main>
     ) : (
-      <div style="padding: 40px;">
-        <a href="/" class="back-link">←</a>
-        <h1>Elemento non trovato</h1>
-      </div>
+      <p style="padding: 50px;">Prodotto non trovato.</p>
     )}
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const accordionItems = document.querySelectorAll('.accordion-item');
+
+        accordionItems.forEach(item => {
+          const header = item.querySelector('.accordion-header');
+          const content = item.querySelector('.accordion-content');
+
+          header.addEventListener('click', () => {
+            const isActive = item.classList.contains('active');
+
+            // Chiudi tutti gli altri
+            document.querySelectorAll('.accordion-item.active').forEach(activeItem => {
+              if (activeItem !== item) {
+                activeItem.classList.remove('active');
+                activeItem.querySelector('.accordion-header').classList.remove('active');
+                activeItem.querySelector('.accordion-content').style.maxHeight = null;
+              }
+            });
+
+            // Apri o chiudi quello cliccato
+            if (isActive) {
+              item.classList.remove('active');
+              header.classList.remove('active');
+              content.style.maxHeight = null;
+            } else {
+              item.classList.add('active');
+              header.classList.add('active');
+              content.style.maxHeight = content.scrollHeight + "px";
+            }
+          });
+        });
+      });
+    </script>
 </body>
 </html>

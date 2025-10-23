@@ -1,4 +1,9 @@
 ---
+<<<<<<< HEAD
+=======
+// src/pages/index.astro
+
+>>>>>>> parent of 5fe3a8d (sito 21 ottobre)
 import Airtable from 'airtable';
 
 // Configura Airtable
@@ -27,31 +32,43 @@ try {
   console.error('Errore caricamento dati:', error);
 }
 
+<<<<<<< HEAD
 const titolo = "Slow Food";
 const today = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
 const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+=======
+// --- Seleziona 10 immagini random ---
+const shuffledItems = [...items].sort(() => 0.5 - Math.random());
+const randomItems = shuffledItems.slice(0, 10);
+
+// --- Logica per la data ---
+const now = new Date();
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const day = now.getDate();
+const month = months[now.getMonth()];
+const year = now.getFullYear();
+const dataCorrente = `${day} ${month} ${year}`;
+>>>>>>> parent of 5fe3a8d (sito 21 ottobre)
 ---
 
-<html lang="en">
+©<html lang="en">
 <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>{titolo}</title> 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
+<<<<<<< HEAD
     <style is:global>
-        html, * {
+        html {
             cursor: none;
         }
 
         body {
             background-color: #d8caa7;
             color: #fd6814;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -126,45 +143,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             z-index: 1002;
             transition: opacity 0.3s ease;
         }
-
-        #scroll-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.2em;
-            color: #22140c;
-            z-index: 1002;
-            opacity: 0;
-            text-align: center;
-            max-width: 600px;
-            line-height: 1.4;
-        }
-
-        #scroll-hint.visible {
-            opacity: 1;
-        }
-
-        .fade-letter {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(8px);
-            animation: fadeInLetter 0.5s ease-out forwards;
-            font-size: inherit;
-            line-height: inherit;
-        }
-
-        .fade-letter.space {
-            width: 0.4em !important;
-            min-width: 0.4em !important;
-        }
-
-        @keyframes fadeInLetter {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
         
         body.awakened #intro-spiral,
         body.awakened #intro-text {
@@ -199,6 +177,7 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             top: 0;
             left: 0;
             overflow: hidden;
+            /* MODIFICA: Aggiunta transizione per l'effetto scorrimento */
             transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
         }
         
@@ -223,31 +202,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
         .manifesto-text::selection { color: #fd6814; background: transparent; }
         .manifesto-text p { margin: 0 0 0.5em 0; }
         
-        .instruction-text {
-            position: fixed;
-            bottom: 10vh;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.1em;
-            color: #22140c;
-            text-align: center;
-            max-width: 90vw;
-            line-height: 1.4;
-            z-index: 30;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        
-        .instruction-text.visible {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        
-        .instruction-text.moved-away {
-            transform: translateX(-50%) translateY(-20px);
-        }
-        
         .image-container { 
             position: absolute; 
             top: 0; left: 0; 
@@ -267,7 +221,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             transition: transform 0.3s ease, filter 0.3s ease;
             z-index: 20;
             pointer-events: auto;
-            /*cursor: grab;*/ /*PROF ha commentato*/
         }
         
         .scattered-image:hover { 
@@ -279,7 +232,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             z-index: 100; 
             transform: scale(1.15) rotate(7deg);
             filter: drop-shadow(10px 10px 20px rgba(253, 104, 20, 0.5));
-            /*cursor: grabbing;*/ /* Prof. ha commentato questo */
         }
         
         #trail-canvas {
@@ -294,6 +246,7 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             opacity: 1;
         }
         
+        /* MODIFICA: Stile unificato e corretto per il calendario (Pagina 2) */
         #calendar-view {
             position: fixed;
             top: 0; left: 0;
@@ -304,12 +257,12 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             gap: 20px;
             padding: 40px;
             box-sizing: border-box;
-            background-color: #21150f;
+            background-color: #d8caa7;
             z-index: 200;
             
             opacity: 0;
             pointer-events: none;
-            transform: translateY(100vh);
+            transform: translateY(100vh); /* Parte da sotto lo schermo */
             transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.5s ease;
         }
         
@@ -343,12 +296,13 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             transform: scale(1); opacity: 1; pointer-events: auto;
         }
         
+        /* MODIFICA: Nuove regole per la transizione a scorrimento */
         body.level-2 .content-area {
-            transform: translateY(-100vh);
+            transform: translateY(-100vh); /* Fa scorrere Pagina 1 verso l'alto */
         }
         
         body.level-2 #calendar-view {
-            transform: translateY(0);
+            transform: translateY(0); /* Fa scorrere Pagina 2 in vista */
             opacity: 1;
             pointer-events: auto;
         }
@@ -380,22 +334,16 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
         </div>
     </div>
     
-    <div id="instruction-1" class="instruction-text">
-        gently move these foods aside to reveal our philosophy
-    </div>
-    <div id="instruction-2" class="instruction-text">
-        Feel free to scroll.
-    </div>
-    
     <div id="calendar-view"></div>
     <canvas id="trail-canvas"></canvas>
     
     <svg id="intro-spiral" xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 24 24" fill="none" stroke="#170e09" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M27.39,22.47c-6.54,6.29-16.94,6.08-23.23-.46C-.86,16.78-.7,8.47,4.53,3.43,8.72-.59,15.37-.46,19.40,3.73c3.22,3.35,3.11,8.67-.23,11.89-2.68,2.58-6.94,2.49-9.51-.19-2.06-2.14-1.99-5.55.15-7.61,1.71-1.65,4.44-1.59,6.09.12,1.32,1.37,1.28,3.55-.1,4.87-1.1,1.05-2.84,1.02-3.9-.08-.84-.88-.82-2.27.06-3.12" fill="none" stroke="#160e0a" stroke-miterlimit="10"/>
     </svg>
-    <div id="intro-text">The world rushes. Slow down... and gently wake me.</div>
-    
-    <div id="scroll-hint"></div>
+    <div id="intro-text">tap to wake me up</div>
+    <div id="scroll-hint" style="opacity: 0; transition: opacity 0.3s ease; color: #22140c; position: fixed; top: calc(50% + 300px); left: 50%; transform: translateX(-50%); font-size: 1.2em; z-index: 1002;">
+        scroll down
+    </div>
         
     
     <svg id="custom-cursor" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#170e09" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -403,34 +351,10 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
     </svg>
     
     <script define:vars={{ items }}>
-        // ✅ FUNZIONE DEFINITIVA - PAROLE INTERE CON SPAZI TRA LORO
-        function createFadeLetters(container, text) {
-            container.innerHTML = '';
-            const words = text.split(' ');
-            let totalDelay = 0;
-            words.forEach((word, wordIndex) => {
-                const wordSpan = document.createElement('span');
-                wordSpan.className = 'fade-letter';
-                wordSpan.textContent = word;
-                wordSpan.style.animationDelay = `${totalDelay}ms`;
-                wordSpan.style.display = 'inline-block';
-                wordSpan.style.whiteSpace = 'nowrap';
-                container.appendChild(wordSpan);
-                totalDelay += 60;
-                if (wordIndex < words.length - 1) {
-                    const spaceSpan = document.createElement('span');
-                    spaceSpan.className = 'fade-letter space';
-                    spaceSpan.innerHTML = '&nbsp;';
-                    spaceSpan.style.animationDelay = `${totalDelay}ms`;
-                    container.appendChild(spaceSpan);
-                    totalDelay += 20;
-                }
-            });
-        }
-    
         function generateCalendar(itemsData) {
             const calendarView = document.getElementById('calendar-view');
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
             months.forEach(month => {
                 const monthContainer = document.createElement('div'); monthContainer.className = 'month-container';
                 const monthTitle = document.createElement('div'); monthTitle.className = 'month-title';
@@ -455,12 +379,10 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             const introText = document.getElementById('intro-text');
             const customCursor = document.getElementById('custom-cursor');
             const trailCanvas = document.getElementById('trail-canvas');
-            const instruction1 = document.getElementById('instruction-1');
-            const instruction2 = document.getElementById('instruction-2');
-            const scrollHint = document.getElementById('scroll-hint');
             let isAwakened = false;
             let trailActive = false;
             let enableScroll = false;
+    
     
             const clockElement = document.getElementById('clock');
             function updateClock() {
@@ -474,8 +396,8 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
             document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
             function animateCursor() {
-                cursorX = mouseX; cursorY = mouseY;
-                if (customCursor) { customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`; }
+                cursorX = (mouseX) * 1; cursorY = (mouseY) * 1;
+                if (customCursor) { customCursor.style.transform = translate(${cursorX - 0}px, ${cursorY - 0}px); } 
                 requestAnimationFrame(animateCursor);
             }
             animateCursor();
@@ -489,54 +411,134 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                     if (!isAwakened) {
                         isAwakened = true;
                         if (introText) introText.style.opacity = '0';
-                        introSpiral.style.setProperty('--mouse-x', `${mouseX}px`);
-                        introSpiral.style.setProperty('--mouse-y', `${mouseY}px`);
+                        
+                        const centerX = window.innerWidth / 2;
+                        const centerY = window.innerHeight / 2;
+                        const mouseXOffset = mouseX - centerX;
+                        const mouseYOffset = mouseY - centerY;
+                        
+                        introSpiral.style.setProperty('--mouse-x', calc(-50% + ${mouseXOffset}px));
+                        introSpiral.style.setProperty('--mouse-y', calc(-50% + ${mouseYOffset}px));
+                        
                         introSpiral.classList.add('animating');
-                        introSpiral.addEventListener('animationend', () => {
-                            introSpiral.style.display = 'none';
-                            if (customCursor) customCursor.style.opacity = '1';
+                        
+                        setTimeout(() => {
                             document.body.classList.add('awakened');
-                            
-                            // ✅ La logica per attivare la scia è qui, ora funzionerà correttamente
+                            if (customCursor) customCursor.style.opacity = '1';
                             trailActive = true;
                             if (trailCanvas) trailCanvas.classList.add('active');
     
-                            setTimeout(() => {
-                                scrollHint.classList.add('visible');
-                                const fullText = "The pace of the modern world is a deafening noise. It makes us forget the true taste of time. Now you will start a journey towards a more conscious way of experiencing food. In the Slow Food world, slowness is not a flaw; it is a virtue. Scroll down to follow me.";
-                                createFadeLetters(scrollHint, fullText);
-                                enableScroll = true;
-                            }, 500);
-                        }, { once: true });
+                            const scrollHint = document.getElementById('scroll-hint');
+                            if (scrollHint) {
+                                setTimeout(() => {
+                                    scrollHint.style.opacity = '1';
+                                    enableScroll = true;
+                                }, 500);
+                            }
+                        }, 2500);
+    
                     }
                 });
             }
     
             generateCalendar(items);
     
-            const manifesto = document.querySelector('.manifesto-text');
             const images = document.querySelectorAll('.scattered-image');
-            let imagesMovedAway = 0;
-            const totalImages = images.length;
-            function checkImagesMovedAway() {
-                imagesMovedAway = 0;
-                const currentManifestoRect = manifesto.getBoundingClientRect();
-                images.forEach(img => {
-                    const imgRect = img.getBoundingClientRect();
-                    const overlap = calculateOverlap(currentManifestoRect, imgRect);
-                    if (overlap < 0.2) {
-                        imagesMovedAway++;
-                    }
+            let isDragging = false, activeImage = null, offsetX = 0, offsetY = 0;
+    
+            // --- INIZIO BLOCCO CORRETTO PER IL DRAG & DROP ---
+            images.forEach(image => {
+                image.addEventListener('mousedown', (e) => { 
+                    e.preventDefault(); 
+                    activeImage = image; 
+                    
+                    // Rimuovi la transizione per un movimento istantaneo
+                    activeImage.style.transition = 'none';
+                    
+                    offsetX = e.clientX - image.getBoundingClientRect().left; 
+                    offsetY = e.clientY - image.getBoundingClientRect().top; 
+                    activeImage.classList.add('dragging'); 
                 });
-                return imagesMovedAway === totalImages;
+            });
+    
+            document.addEventListener('mousemove', (e) => { 
+                if (activeImage) { 
+                    isDragging = true; 
+                    const pRect = activeImage.parentElement.getBoundingClientRect();
+                    activeImage.style.left = ${e.clientX - pRect.left - offsetX}px; 
+                    activeImage.style.top = ${e.clientY - pRect.top - offsetY}px; 
+                } 
+            });
+    
+            document.addEventListener('mouseup', () => { 
+                if (activeImage) {
+                    // Ripristina la transizione per le animazioni future
+                    activeImage.style.transition = 'top 0.8s ease-out, left 0.8s ease-out, transform 0.8s ease-out, opacity 0.8s ease-out';
+                    
+                    activeImage.classList.remove('dragging'); 
+                    activeImage = null; 
+                    setTimeout(() => { isDragging = false; }, 50); 
+                } 
+            });
+            // --- FINE BLOCCO CORRETTO ---
+    
+            images.forEach(image => {
+                image.addEventListener('dblclick', (event) => {
+                    if (isDragging) return;
+                    const itemId = image.dataset.id;
+                    if (itemId) { window.location.href = /items/${itemId}; }
+                });
+            });
+    
+            const canvas = document.getElementById('trail-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let lastMouse = { x: mouse.x, y: mouse.innerHeight / 2 };
+            window.addEventListener('mousemove', (event) => { mouse.x = event.clientX; mouse.y = event.clientY; });
+            function animateTrail() {
+                if (trailActive) {
+                    ctx.globalCompositeOperation = 'destination-out'; 
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; 
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalCompositeOperation = 'source-over'; 
+                    
+                    const dx = mouse.x - lastMouse.x, dy = mouse.y - lastMouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy), angle = Math.atan2(dy, dx);
+                    const radius = 10, stepSize = 5;
+                    for (let i = 0; i < distance; i += stepSize) {
+                        const x = lastMouse.x + Math.cos(angle) * i; 
+                        const y = lastMouse.y + Math.sin(angle) * i;
+                        const trailHead = ctx.createRadialGradient(x, y, 0, x, y, radius);
+                        trailHead.addColorStop(0, 'rgba(253, 104, 20, 0.5)'); 
+                        trailHead.addColorStop(1, 'rgba(253, 104, 20, 0)');
+                        ctx.fillStyle = trailHead; 
+                        ctx.beginPath(); 
+                        ctx.arc(x, y, radius, 0, Math.PI * 2); 
+                        ctx.fill();
+                    }
+                    lastMouse.x = mouse.x; 
+                    lastMouse.y = mouse.y;
+                }
+                requestAnimationFrame(animateTrail);
             }
-            function calculateOverlap(rect1, rect2) {
-                const xOverlap = Math.max(0, Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left));
-                const yOverlap = Math.max(0, Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top));
-                const overlapArea = xOverlap * yOverlap;
-                const combinedArea = (rect1.width * rect1.height) + (rect2.width * rect2.height);
-                return overlapArea / combinedArea;
-            }
+            animateTrail();
+            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    
+            let currentLevel = 0;
+            const maxLevel = 2;
+            let scrollTimeout;
+            let isTransitioning = false;
+            const transitionDuration = 800;
+    
+            let level1Scrolled = 0;
+            let manifestoScrolled = 0;
+            let toLevel2Scrolled = 0;
+            const imageThreshold = 80;
+            const manifestoThreshold = 100;
+            const toLevel2Threshold = 500;
+            let manifestoRevealed = false;
+            const manifesto = document.querySelector('.manifesto-text');
             const imagesArray = Array.from(images);
             function shuffle(arr) {
                 for (let i = arr.length - 1; i > 0; i--) {
@@ -545,117 +547,25 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                 }
             }
             shuffle(imagesArray);
+            const totalImages = imagesArray.length;
             images.forEach(img => {
-                img.dataset.targetTop = `${Math.random() * 70 + 5}vh`;
-                img.dataset.targetLeft = `${Math.random() * 70 + 5}vw`;
-                img.dataset.targetRotate = `${Math.random() * 30 - 15}deg`;
+                img.dataset.targetTop = ${Math.random() * 70 + 5}vh;
+                img.dataset.targetLeft = ${Math.random() * 70 + 5}vw;
+                img.dataset.targetRotate = ${Math.random() * 30 - 15}deg;
                 img.style.top = '50%';
                 img.style.left = '50%';
-                img.style.transform = `translate(-50%, -50%) scale(0)`;
+                img.style.transform = translate(-50%, -50%) scale(0);
                 img.style.opacity = '0';
             });
     
-            let isDragging = false, activeImage = null, offsetX = 0, offsetY = 0;
-            images.forEach(image => {
-                image.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    activeImage = image;
-                    activeImage.style.transition = 'none';
-                    const rect = image.getBoundingClientRect();
-                    offsetX = e.clientX - rect.left;
-                    offsetY = e.clientY - rect.top;
-                    activeImage.classList.add('dragging');
-                });
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (activeImage) {
-                    isDragging = true;
-                    const pRect = activeImage.parentElement.getBoundingClientRect();
-                    activeImage.style.left = `${e.clientX - pRect.left - offsetX}px`;
-                    activeImage.style.top = `${e.clientY - pRect.top - offsetY}px`;
-                }
-            });
-            document.addEventListener('mouseup', () => {
-                if (activeImage) {
-                    activeImage.style.transition = 'top 0.8s ease-out, left 0.8s ease-out, transform 0.8s ease-out, opacity 0.8s ease-out';
-                    activeImage.classList.remove('dragging');
-                    activeImage = null;
-                    setTimeout(() => {
-                        isDragging = false;
-                        if (document.body.classList.contains('level-1') && checkImagesMovedAway()) {
-                            instruction1.classList.add('moved-away');
-                            setTimeout(() => {
-                                instruction1.classList.remove('visible');
-                                instruction2.classList.add('visible');
-                            }, 500);
-                        }
-                    }, 300);
-                }
-            });
-            images.forEach(image => {
-                image.addEventListener('dblclick', (event) => {
-                    if (isDragging) return;
-                    const itemId = image.dataset.id;
-                    if (itemId) { window.location.href = `/items/${itemId}`; }
-                });
-            });
-    
-            // TRAIL CANVAS
-            const canvas = document.getElementById('trail-canvas');
-            // ✅ CORREZIONE: Cambiato getContext('d') in getContext('2d') per inizializzare correttamente il canvas.
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-            let lastMouse = { x: mouse.x, y: mouse.y };
-            window.addEventListener('mousemove', (event) => { mouse.x = event.clientX; mouse.y = event.clientY; });
-            function animateTrail() {
-                if (trailActive) {
-                    ctx.globalCompositeOperation = 'destination-out';
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalCompositeOperation = 'source-over';
-                    const dx = mouse.x - lastMouse.x, dy = mouse.y - lastMouse.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy), angle = Math.atan2(dy, dx);
-                    const radius = 10, stepSize = 5;
-                    for (let i = 0; i < distance; i += stepSize) {
-                        const x = lastMouse.x + Math.cos(angle) * i;
-                        const y = lastMouse.y + Math.sin(angle) * i;
-                        const trailHead = ctx.createRadialGradient(x, y, 0, x, y, radius);
-                        trailHead.addColorStop(0, 'rgba(253, 104, 20, 0.5)');
-                        trailHead.addColorStop(1, 'rgba(253, 104, 20, 0)');
-                        ctx.fillStyle = trailHead;
-                        ctx.beginPath();
-                        ctx.arc(x, y, radius, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    lastMouse.x = mouse.x;
-                    lastMouse.y = mouse.y;
-                }
-                requestAnimationFrame(animateTrail);
-            }
-            animateTrail();
-            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-    
-            // SCROLL LOGIC
-            let currentLevel = 0;
-            const maxLevel = 2;
-            let isTransitioning = false;
-            let level1Scrolled = 0;
-            let manifestoRevealed = false;
-            let instruction1Shown = false;
-            let instruction2Shown = false;
-            const imageThreshold = 80;
-            const transitionDuration = 800;
             document.addEventListener('wheel', (e) => {
                 if (!enableScroll || isTransitioning) return;
+    
                 const scrollHint = document.getElementById('scroll-hint');
                 if (scrollHint) {
                     scrollHint.style.opacity = '0';
-                    //Prof. ha aggiunto le due righe seguenti
-                    scrollHint.style.display = 'none';
-                    scrollHint.style.visibility = 'hidden';
                 }
+    
                 if (currentLevel === 0 && e.deltaY > 0) {
                     currentLevel = 1;
                     document.body.classList.add('level-1');
@@ -663,8 +573,27 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                     setTimeout(() => { isTransitioning = false; }, transitionDuration);
                     return;
                 }
+    
                 if (currentLevel === 1 && e.deltaY > 0) {
                     level1Scrolled += Math.abs(e.deltaY);
+                    const maxImageScroll = totalImages * imageThreshold;
+                    if (level1Scrolled > maxImageScroll) {
+                        const extra = level1Scrolled - maxImageScroll;
+                        level1Scrolled = maxImageScroll;
+                        if (!manifestoRevealed) {
+                            manifestoScrolled += extra;
+                            if (manifestoScrolled > manifestoThreshold) {
+                                manifesto.style.top = '50%';
+                                manifesto.style.transform = 'translate(-50%, -50%) scale(1)';
+                                manifesto.style.opacity = '1';
+                                manifestoRevealed = true;
+                                manifestoScrolled = manifestoThreshold;
+                            }
+                        } else {
+                            toLevel2Scrolled += extra;
+                        }
+                    }
+    
                     const numToReveal = Math.min(totalImages, Math.floor(level1Scrolled / imageThreshold));
                     for (let i = 0; i < numToReveal; i++) {
                         const img = imagesArray[i];
@@ -672,44 +601,190 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                             img.style.transition = 'top 0.8s ease-out, left 0.8s ease-out, transform 0.8s ease-out, opacity 0.8s ease-out';
                             img.style.top = img.dataset.targetTop;
                             img.style.left = img.dataset.targetLeft;
-                            img.style.transform = `rotate(${img.dataset.targetRotate}) scale(1)`;
+                            img.style.transform = rotate(${img.dataset.targetRotate}) scale(1);
                             img.style.opacity = '1';
                             img.classList.add('revealed');
                         }
                     }
-                    if (numToReveal >= totalImages && !manifestoRevealed) {
-                        manifesto.style.top = '50%';
-                        manifesto.style.transform = 'translate(-50%, -50%) scale(1)';
-                        manifesto.style.opacity = '1';
-                        manifestoRevealed = true;
-                        setTimeout(() => {
-                            instruction1.classList.add('visible');
-                            instruction1Shown = true;
-                        }, 600);
+    
+                    if (!manifestoRevealed || toLevel2Scrolled < toLevel2Threshold) {
+                        return;
                     }
                 }
-                if (currentLevel === 1 && e.deltaY > 0 && instruction2Shown) {
-                    currentLevel = 2;
-                    document.body.classList.add('level-2');
-                    document.body.classList.remove('level-1');
-                    isTransitioning = true;
-                    setTimeout(() => { isTransitioning = false; }, transitionDuration);
-                }
-            }, { passive: true });
-            const checkInterval = setInterval(() => {
-                if (instruction1Shown && !instruction2Shown && checkImagesMovedAway()) {
-                    clearInterval(checkInterval);
-                    instruction1.classList.add('moved-away');
-                    setTimeout(() => {
-                        instruction1.classList.remove('visible');
+    
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    const oldLevel = currentLevel;
+                    let newLevel = currentLevel;
+    
+                    if (e.deltaY > 0 && currentLevel < maxLevel) {
+                        newLevel++;
+                    } 
+                    else if (e.deltaY < 0 && currentLevel > 0) {
+                        newLevel--;
+                    }
+                    
+                    if (newLevel !== oldLevel) {
+                        isTransitioning = true;
+    
+                        currentLevel = newLevel;
+                        document.body.classList.remove('level-' + oldLevel);
+                        document.body.classList.add('level-' - currentLevel);
+    
                         setTimeout(() => {
-                            instruction2.classList.add('visible');
-                            instruction2Shown = true;
-                        }, 300);
-                    }, 500);
-                }
-            }, 200);
+                            isTransitioning = false;
+                        }, transitionDuration);
+                    }
+                }, 50);
+            }, { passive: true });
         });
+=======
+    <style>
+      /* --- IMPOSTAZIONI GLOBALI --- */
+      html {
+        cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><circle cx='8' cy='8' r='2' fill='%23D2B48C'/><circle cx='8' cy='8' r='7' stroke='%23D2B48C' stroke-width='1' fill='none'/></svg>"), auto;
+      }
+      
+      body {
+        background-color: #463529;
+        color: #d3a76e;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        line-height: 1.6; margin: 0; padding: 0; overflow-x: hidden;
+      }
+
+      /* --- TIPOGRAFIA --- */
+      h1 {
+        font-size: 70px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.2;
+        margin: 40px 0;
+        padding: 0;
+        color: #D2B48C;
+      }
+
+      /* --- CONTENITORE PER LA GRIGLIA DI IMMAGINI --- */
+      .image-canvas {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* Stile per i link delle card */
+      .card-link {
+        text-decoration: none;
+        display: block;
+      }
+
+      /* --- STILE DEL CONTENITORE 'card' --- */
+      .card {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        cursor: pointer;
+        transition: none;
+      }
+      .card img {
+        width: 100%; height: 100%; object-fit: cover; display: block;
+      }
+      .card:hover {
+        transform: scale(1.1);
+        box-shadow: none;
+      }
+      
+      /* --- FORM DI CONTRIBUTO --- */
+      .contribute-section { position: fixed; bottom: 20px; right: 20px; z-index: 101; font-size: 14px; }
+      .contribute-section summary {
+        cursor: pointer; padding: 8px 12px; background-color: #3D2B1F;
+        border: 1px solid #D2B48C; color: #D2B48C; display: inline-block;
+      }
+      .contribute-form {
+        margin-top: 10px; padding: 20px; background-color: #3D2B1F;
+        border: 1px solid #D2B48C; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      }
+      .form-group { margin-bottom: 15px; }
+      .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+      .form-group input, .form-group textarea, .form-group select {
+        width: 100%; padding: 8px; border: 1px solid #D2B48C;
+        background-color: #4a3a2a; color: #D2B48C; box-sizing: border-box;
+      }
+      .submit-btn {
+        width: 100%; padding: 10px; background-color: #D2B48C;
+        color: #3D2B1F; border: none; cursor: pointer; font-size: 1em; font-weight: bold;
+      }
+      .submit-btn:disabled { background-color: #888; }
+      .form-message { margin-top: 10px; padding: 10px; }
+      .form-message.success { background-color: #e0f8e0; border: 1px solid #5cb85c; color: #333; }
+      .form-message.error { background-color: #f8e0e0; border: 1px solid #d9534f; color: #333; }
+
+    </style>
+</head>
+<body>
+    <h1>{dataCorrente}</h1>
+    
+    <div class="image-canvas">
+      {randomItems.map(item => (
+        <a href={`/items/${item.id}`} class="card-link">
+          <div class="card">
+            {item.image && <img src={item.image} alt={item.name} />}
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <details class="contribute-section">
+      <summary>Vuoi contribuire all'archivio?</summary>
+      <form id="contribute-form" class="contribute-form">
+        <div class="form-group"><label for="title">Titolo *</label><input type="text" id="title" name="title" required /></div>
+        <div class="form-group"><label for="description">Descrizione *</label><textarea id="description" name="description" rows="4" required></textarea></div>
+        <div class="form-group"><label for="category">Categoria</label><select id="category" name="category"><option value="">Seleziona...</option><option value="Neri">Neri</option><option value="Siamesi">Siamesi</option><option value="Europei">Europei</option><option value="Altro">Altro</option></select></div>
+        <div class="form-group"><label for="image-url">URL Immagine</label><input type="url" id="image-url" name="imageUrl" placeholder="https://esempio.com/immagine.jpg" /><small>Inserisci il link di un'immagine già online.</small></div>
+        <button type="submit" class="submit-btn">Invia contributo</button>
+        <div id="form-message" class="form-message"></div>
+      </form>
+    </details>
+
+    <script is:inline>
+      document.getElementById('contribute-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('.submit-btn');
+        const messageDiv = document.getElementById('form-message');
+        submitBtn.disabled = true; submitBtn.textContent = 'Invio in corso...'; messageDiv.textContent = '';
+        const imageUrl = document.getElementById('image-url').value.trim();
+        const formData = {
+          Name: document.getElementById('title').value,
+          Description: document.getElementById('description').value,
+          Category: document.getElementById('category').value,
+        };
+        if (imageUrl) { formData.Image = [{ url: imageUrl }]; }
+        try {
+          const response = await fetch(`https://api.airtable.com/v0/${import.meta.env.PUBLIC_AIRTABLE_BASE_ID}/${import.meta.env.PUBLIC_AIRTABLE_TABLE_NAME}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${import.meta.env.PUBLIC_AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: formData })
+          });
+          const responseData = await response.json();
+          if (response.ok) {
+            messageDiv.textContent = '✅ Contributo inviato! Ricarica la pagina per vederlo.';
+            messageDiv.className = 'form-message success';
+            e.target.reset();
+          } else {
+            messageDiv.textContent = `❌ Errore: ${responseData.error?.message || 'Errore sconosciuto'}`;
+            messageDiv.className = 'form-message error';
+          }
+        } catch (error) {
+          messageDiv.textContent = '❌ Errore di rete. Riprova.';
+          messageDiv.className = 'form-message error';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Invia contributo';
+        }
+      });
+>>>>>>> parent of 5fe3a8d (sito 21 ottobre)
     </script>
 </body>
 </html>
