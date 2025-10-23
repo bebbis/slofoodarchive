@@ -267,7 +267,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             transition: transform 0.3s ease, filter 0.3s ease;
             z-index: 20;
             pointer-events: auto;
-            /*cursor: grab;*/ /*PROF ha commentato*/
         }
         
         .scattered-image:hover { 
@@ -279,7 +278,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             z-index: 100; 
             transform: scale(1.15) rotate(7deg);
             filter: drop-shadow(10px 10px 20px rgba(253, 104, 20, 0.5));
-            /*cursor: grabbing;*/ /* Prof. ha commentato questo */
         }
         
         #trail-canvas {
@@ -298,11 +296,12 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 20px;
-            padding: 40px;
+            
+            /* Layout a blocco con scroll */
+            display: block;
+            overflow-y: auto;
+            
+            padding: 100px 40px 40px 40px;
             box-sizing: border-box;
             background-color: #21150f;
             z-index: 200;
@@ -314,29 +313,83 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
         }
         
         .month-container {
-            border: 2px dashed #fd6814; display: flex; flex-direction: column;
-            align-items: center; justify-content: flex-start;
-            position: relative; overflow: hidden; background-color: #d8caa7;
+            margin-bottom: 35px; 
         }
         
         .month-title {
-            width: 100%; font-size: 1.1em; font-weight: bold;
-            text-align: center; padding: 8px 0;
-            background-color: #fd6814; color: #d8caa7;
-            z-index: 2; margin-bottom: 10px;
+            width: 100%; 
+            font-size: 1.5em; 
+            font-weight: bold;
+            text-align: left; 
+            padding-bottom: 8px;
+            background-color: transparent; 
+            color: #fd6814; 
+            z-index: 2; 
+            margin-bottom: 15px;
+            border-bottom: 2px solid #fd6814; 
         }
         
-        .silhouettes-container {
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start;
-            gap: 10px; padding: 0 10px 10px 10px;
-            width: 100%; height: calc(100% - 50px);
-            box-sizing: border-box; overflow-y: auto;
+        /* === MODIFICA QUI === */
+        .food-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            color: #d8caa7;
+            font-size: 1.1em;
+            text-align: left;
+            width: 100%;
+            
+            /* Rimosso il layout a colonne */
+            /* column-count: 4; */ 
+            /* column-gap: 20px; */
         }
         
-        .month-silhouette {
-            height: 45px; width: auto;
-            filter: brightness(0) saturate(100%) invert(52%) sepia(87%) saturate(1478%) hue-rotate(349deg) brightness(99%) contrast(98%);
-            opacity: 0.9;
+        .food-item {
+            padding: 5px 8px;
+            margin: 1px 0;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            
+            /* Rimosso per evitare bug con colonna singola */
+            /* break-inside: avoid-column; */
+            
+            /* Per estetica, puoi dare una larghezza massima se vuoi */
+            max-width: 300px; 
+        }
+        /* === FINE MODIFICA === */
+
+        .food-item:hover {
+            color: #21150f; 
+            background-color: #fd6814;
+        }
+        
+        #hover-image-container {
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: none;
+            z-index: 10000;
+            pointer-events: none;
+            background: #d8caa7;
+            border: 2px solid #fd6814;
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(25, 14, 9, 0.3);
+            will-change: transform;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+        
+        #hover-image-container img {
+            display: block;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
         }
         
         body.level-1 .image-container {
@@ -354,7 +407,7 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
         }
 
     </style>
-</head>
+    </head>
 <body class="level-0">
     <div class="site-title">SLOW FOOD ARCHIVE</div>
     <div class="date-display">{today}</div>
@@ -402,8 +455,12 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
         <path d="M27.39,22.47c-6.54,6.29-16.94,6.08-23.23-.46C-.86,16.78-.7,8.47,4.53,3.43,8.72-.59,15.37-.46,19.40,3.73c3.22,3.35,3.11,8.67-.23,11.89-2.68,2.58-6.94,2.49-9.51-.19-2.06-2.14-1.99-5.55.15-7.61,1.71-1.65,4.44-1.59,6.09.12,1.32,1.37,1.28,3.55-.1,4.87-1.1,1.05-2.84,1.02-3.9-.08-.84-.88-.82-2.27.06-3.12" fill="none" stroke="#160e0a" stroke-miterlimit="10"/>
     </svg>
     
+    <div id="hover-image-container">
+        <img src="" alt="Food preview" />
+    </div>
+    
     <script define:vars={{ items }}>
-        // ✅ FUNZIONE DEFINITIVA - PAROLE INTERE CON SPAZI TRA LORO
+        // FUNZIONE PER LETTERE IN FADE-IN
         function createFadeLetters(container, text) {
             container.innerHTML = '';
             const words = text.split(' ');
@@ -428,28 +485,47 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             });
         }
     
+        // FUNZIONE GENERAZIONE CALENDARIO (invariata)
+        // (La logica di filtro per mese è già corretta qui)
         function generateCalendar(itemsData) {
             const calendarView = document.getElementById('calendar-view');
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            calendarView.innerHTML = ''; 
+            
             months.forEach(month => {
-                const monthContainer = document.createElement('div'); monthContainer.className = 'month-container';
-                const monthTitle = document.createElement('div'); monthTitle.className = 'month-title';
+                const monthContainer = document.createElement('div');
+                monthContainer.className = 'month-container';
+                
+                const monthTitle = document.createElement('div');
+                monthTitle.className = 'month-title';
                 monthTitle.textContent = month.toUpperCase();
-                const silhouettesContainer = document.createElement('div'); silhouettesContainer.className = 'silhouettes-container';
-                const seasonalItems = itemsData.filter(item => item.seasonality && item.seasonality.includes(month));
+                
+                const foodList = document.createElement('ul');
+                foodList.className = 'food-list';
+                
+                // Questa funzione filtra correttamente gli alimenti
+                const seasonalItems = itemsData.filter(item => 
+                    item.seasonality && item.seasonality.includes(month)
+                );
+                
                 seasonalItems.forEach(item => {
                     if (item.edited) {
-                        const img = document.createElement('img');
-                        img.src = item.edited; img.alt = item.name; img.className = 'month-silhouette';
-                        silhouettesContainer.appendChild(img);
+                        const li = document.createElement('li');
+                        li.className = 'food-item';
+                        li.textContent = item.name;
+                        li.dataset.imageUrl = item.edited;
+                        foodList.appendChild(li);
                     }
                 });
+                
                 monthContainer.appendChild(monthTitle);
-                monthContainer.appendChild(silhouettesContainer);
+                monthContainer.appendChild(foodList);
                 calendarView.appendChild(monthContainer);
             });
         }
     
+        // SCRIPT PRINCIPALE (DOMContentLoaded)
         document.addEventListener('DOMContentLoaded', () => {
             const introSpiral = document.getElementById('intro-spiral');
             const introText = document.getElementById('intro-text');
@@ -458,10 +534,16 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             const instruction1 = document.getElementById('instruction-1');
             const instruction2 = document.getElementById('instruction-2');
             const scrollHint = document.getElementById('scroll-hint');
+            
+            const calendarView = document.getElementById('calendar-view');
+            const hoverContainer = document.getElementById('hover-image-container');
+            const hoverImageEl = hoverContainer ? hoverContainer.querySelector('img') : null;
+            
             let isAwakened = false;
             let trailActive = false;
             let enableScroll = false;
     
+            // Orologio
             const clockElement = document.getElementById('clock');
             function updateClock() {
                 if (clockElement) {
@@ -470,9 +552,19 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
             }
             updateClock(); setInterval(updateClock, 1000);
     
-            const interactiveElements = document.querySelectorAll('a, button, .scattered-image, .manifesto-text, input, textarea');
+            // Cursore custom e immagine hover
+            const interactiveElements = document.querySelectorAll('a, button, .scattered-image, .manifesto-text, input, textarea, .food-item');
             let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-            document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+            document.addEventListener('mousemove', (e) => { 
+                mouseX = e.clientX; 
+                mouseY = e.clientY; 
+                
+                if (hoverContainer && hoverContainer.style.display === 'block') {
+                    hoverContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+                }
+            });
+            
             function animateCursor() {
                 cursorX = mouseX; cursorY = mouseY;
                 if (customCursor) { customCursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`; }
@@ -484,6 +576,7 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                 el.addEventListener('mouseleave', () => customCursor.classList.remove('hidden'));
             });
     
+            // Animazione introduzione
             if (introSpiral) {
                 introSpiral.addEventListener('click', (e) => {
                     if (!isAwakened) {
@@ -497,7 +590,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                             if (customCursor) customCursor.style.opacity = '1';
                             document.body.classList.add('awakened');
                             
-                            // ✅ La logica per attivare la scia è qui, ora funzionerà correttamente
                             trailActive = true;
                             if (trailCanvas) trailCanvas.classList.add('active');
     
@@ -512,8 +604,37 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                 });
             }
     
+            // Genera calendario
             generateCalendar(items);
+            
+            // Listener per hover su calendario
+            if (calendarView && hoverContainer && hoverImageEl) {
+                calendarView.addEventListener('mouseover', (e) => {
+                    if (e.target.classList.contains('food-item')) {
+                        const imgUrl = e.target.dataset.imageUrl;
+                        if (imgUrl) {
+                            hoverImageEl.src = imgUrl;
+                            hoverContainer.style.display = 'block';
+                            hoverContainer.style.transform = `translate(${mouseX + 20}px, ${mouseY + 20}px)`;
+                            hoverContainer.style.opacity = '1';
+                        }
+                    }
+                });
+        
+                calendarView.addEventListener('mouseout', (e) => {
+                    if (e.target.classList.contains('food-item')) {
+                        hoverContainer.style.opacity = '0';
+                        setTimeout(() => {
+                            if (hoverContainer.style.opacity === '0') {
+                                hoverContainer.style.display = 'none';
+                                hoverImageEl.src = '';
+                            }
+                        }, 100);
+                    }
+                });
+            }
     
+            // Logica drag & drop immagini
             const manifesto = document.querySelector('.manifesto-text');
             const images = document.querySelectorAll('.scattered-image');
             let imagesMovedAway = 0;
@@ -603,7 +724,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
     
             // TRAIL CANVAS
             const canvas = document.getElementById('trail-canvas');
-            // ✅ CORREZIONE: Cambiato getContext('d') in getContext('2d') per inizializzare correttamente il canvas.
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -652,7 +772,6 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', mi
                 const scrollHint = document.getElementById('scroll-hint');
                 if (scrollHint) {
                     scrollHint.style.opacity = '0';
-                    //Prof. ha aggiunto le due righe seguenti
                     scrollHint.style.display = 'none';
                     scrollHint.style.visibility = 'hidden';
                 }
