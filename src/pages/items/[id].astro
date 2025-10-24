@@ -1,7 +1,7 @@
 ---
 import Airtable from 'airtable';
 
-// --- La parte JavaScript (getStaticPaths, recipeMap, ecc.) rimane INVARIATA ---
+// --- La parte getStaticPaths rimane INVARIATA ---
 export async function getStaticPaths() {
   const base = new Airtable({
     apiKey: import.meta.env.PUBLIC_AIRTABLE_API_KEY
@@ -29,10 +29,14 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 
-// ... (Il tuo recipeMap e getRecipes rimangono qui, invariati)
-const recipeMap = { /* ... */ };
-function getRecipes(productName) { /* ... */ }
-const recipes = getRecipes(item?.name || '');
+// --- INIZIO LOGICA RICETTE (Aggiornata) ---
+// Queste tre ricette appariranno per OGNI prodotto.
+const recipes = [
+  "Decotto digestivo",
+  "Linguine gamberetti, zucchine e zafferano",
+  "Risotto allo zafferano e pancetta"
+];
+// --- FINE LOGICA RICETTE ---
 ---
 
 <html lang="it">
@@ -193,12 +197,13 @@ const recipes = getRecipes(item?.name || '');
       padding-bottom:0px;
     }
 
-    /* --- Stili per la riga INFO --- */
+    /* --- Stili per la riga INFO (Corretto) --- */
     .info-row {
       display: flex;
       flex-direction: row; 
       flex-wrap: wrap; 
-      gap: 2rem; 
+      column-gap: 2rem;
+      row-gap: 0px; 
       margin: 0px; 
       padding-top: 6px;
       padding-bottom: 6px;
@@ -217,6 +222,7 @@ const recipes = getRecipes(item?.name || '');
       padding: 0px;
       color: var(--color-text-dark); 
       transition: color 0.2s ease-in-out; 
+      line-height: 1.2;
     }
 
     .info-item:hover {
@@ -228,17 +234,26 @@ const recipes = getRecipes(item?.name || '');
       padding: 0px;
     }
     
-    .p{ 
+    p { 
       margin: 0px;
       padding: 0px;
     }
     
-    /* --- STILI PER BLOCCO PRODUTTORI --- */
-    .producers-block {
-      max-width: 50%; 
+    /* --- STILI PER BLOCCHI ACCORDION (Recipes & Producers) --- */
+    
+    .accordion-column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem; /* Ridotto lo spazio */
+      max-width: 20%; /* Stretta la colonna */
+      width: 100%;
     }
 
-    .producers-title {
+    .producers-block, .recipes-block {
+      width: 100%;
+    }
+
+    .producers-title, .recipes-title {
       font-weight: 600;
       font-size: 1em;
       text-transform: uppercase;
@@ -248,7 +263,7 @@ const recipes = getRecipes(item?.name || '');
       user-select: none; 
     }
     
-    .producers-title::after {
+    .producers-title::after, .recipes-title::after {
       content: '←'; 
       display: inline-block;
       margin-left: 0.25em;
@@ -258,15 +273,15 @@ const recipes = getRecipes(item?.name || '');
       transform: rotate(0deg); 
     }
     
-    .producers-title.active::after {
+    .producers-title.active::after, .recipes-title.active::after {
       transform: rotate(-90deg); 
     }
 
-    .producers-content {
+    .producers-content, .recipes-content {
       margin: 0;
     }
 
-    .producer-item {
+    .producer-item, .recipe-item {
       padding-bottom: 6px;
       padding-top: 6px;
       border-bottom: 2px solid var(--color-border); 
@@ -275,16 +290,23 @@ const recipes = getRecipes(item?.name || '');
       transition: color 0.2s ease-in-out; 
     }
 
-    .producer-item:hover {
+    .producer-item:hover, .recipe-item:hover {
       color: var(--color-highlight-border); 
     }
 
-    .producer-item:last-child {
+    /* Regola divisa: questa rimuove il bordo per entrambi */
+    .producer-item:last-child, .recipe-item:last-child {
       border-bottom: none; 
       padding-bottom: 0;
     }
+
+    /* Regola aggiuntiva: aggiunge spazio SOLO a "add your recipe" */
+    .recipe-item:last-child {
+      padding-top: 1.5rem; 
+    }
     
-    .producers-block p:not(.producers-title) {
+    .producers-block p:not(.producers-title), 
+    .recipes-block p:not(.recipes-title) {
       margin: 0; 
     }
 
@@ -352,21 +374,37 @@ const recipes = getRecipes(item?.name || '');
         </div> 
         
         <div class="footer-content">
-          {item.producers && (
-            <div class="producers-block">
-              <p class="producers-title">Where to find it</p>
-
-              <div class="producers-content">
-                {Array.isArray(item.producers) ? (
-                  item.producers.map((producer) => (
-                    <div class="producer-item">{producer}</div>
-                  ))
-                ) : (
-                  <p>{item.producers}</p> )}
-              </div>
-              </div>
-          )}
           
+          <div class="accordion-column">
+
+            {recipes && recipes.length > 0 && (
+              <div class="recipes-block">
+                <p class="recipes-title">Recipes</p>
+                <div class="recipes-content">
+                  {recipes.map((recipe) => (
+                    <div class="recipe-item">{recipe}</div>
+                  ))}
+                  <div class="recipe-item">add your recipe +</div>
+                </div>
+              </div>
+            )}
+
+            {item.producers && (
+              <div class="producers-block">
+                <p class="producers-title">Where to find it</p>
+
+                <div class="producers-content">
+                  {Array.isArray(item.producers) ? (
+                    item.producers.map((producer) => (
+                      <div class="producer-item">{producer}</div>
+                    ))
+                  ) : (
+                    <p>{item.producers}</p> )}
+                </div>
+                </div>
+            )}
+
+          </div> 
           {item.image && <img src={item.image} alt={item.name} class="main-image" />}
         </div>
 
@@ -382,18 +420,24 @@ const recipes = getRecipes(item?.name || '');
         const producersContent = document.querySelector('.producers-content');
 
         if (producersTitle && producersContent) {
-          // 1. Nascondi il contenuto di default
           producersContent.style.display = 'none';
-
-          // 2. Aggiungi l'evento click al titolo
           producersTitle.addEventListener('click', () => {
             const isHidden = producersContent.style.display === 'none';
-            
-            // Mostra o nascondi il contenuto
             producersContent.style.display = isHidden ? 'block' : 'none';
-            
-            // Aggiungi/rimuovi la classe 'active' per cambiare la freccia
             producersTitle.classList.toggle('active', isHidden);
+          });
+        }
+
+        // Logica per l'accordion "Recipes"
+        const recipesTitle = document.querySelector('.recipes-title');
+        const recipesContent = document.querySelector('.recipes-content');
+
+        if (recipesTitle && recipesContent) {
+          recipesContent.style.display = 'none';
+          recipesTitle.addEventListener('click', () => {
+            const isHidden = recipesContent.style.display === 'none';
+            recipesContent.style.display = isHidden ? 'block' : 'none';
+            recipesTitle.classList.toggle('active', isHidden);
           });
         }
       });
